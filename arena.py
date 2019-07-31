@@ -38,13 +38,6 @@ global arena, old_arena
 arena = ["black"] * height * width
 old_arena = copy.copy(arena)
 
-def wrap_coords(x, y):
-    "If a coordinate is out of bounds, wrap around."
-    global height, width
-    if y < 0 or y >= height: y = y % height
-    if x < 0 or x >= width: x = x % width
-    return x, y
-
 def clear_arena(colour="black", show=True):
     "Reset the arena to a given colour (default: off)"
     global arena, height, width
@@ -54,7 +47,8 @@ def clear_arena(colour="black", show=True):
 def pixel_id(x, y):
     "Get the LED ID of a given set of coordinates"
     global height, width
-    x, y = wrap_coords(x, y)
+    if x < 0 or y < 0 or x >= width or y >= height:
+        raise Exception(str(x)+"/"+str(y)+" is out of bounds.")
     if x%2 == 1:
         return (x+1)*height - y - 1
     else: return x*height + y
