@@ -7,7 +7,8 @@ at the Department for Behavioural Physiology and Sociobiology
 ([Zoo2](https://www.biozentrum.uni-wuerzburg.de/en/zoo2/research/el-jundi-lab/)), 
 University of Würzburg.
 
-The arenas consist of a circular drum with inlaid LED panels. <!--TODO make/model?-->
+The arenas consist of a circular drum with inlaid LED panels.
+(8x Adafruit Dotstar 16x16 pixel APA102 RGB LED matrix)
 
 ## Overview
 
@@ -22,7 +23,7 @@ used to construct experiment display setups.
 There are a couple of scripts to display pre-defined images/animations:
 
 * `house.py` is an example script that draws an image of a house
-* *work in progress*
+* *work in progress...*
 
 ## Usage
 
@@ -34,6 +35,7 @@ or individual pixels:
 ./arena.py set <x> <y> <colour>
 ```
 
+<!--obsolete-->
 (Use `--serial` or `--parallel` before the clear/set command to choose a mode.)
 
 ---

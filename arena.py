@@ -11,15 +11,50 @@
 ### Licensed under the terms of the MIT License
 
 import sys, math, copy
-from dotstar import Adafruit_DotStar
+import RPi.GPIO as GPIO              #https://pypi.org/project/RPi.GPIO/
+from dotstar import Adafruit_DotStar #https://github.com/adafruit/Adafruit_DotStar_Pi
 
-global MODE = "SERIAL" #options: "SERIAL" / "PARALLEL"
+## The mode determines which output device is chosen and how this is treated.
+## "TEXT":      Print an ASCII representation to STDOUT (during development)
+## "SERIAL":    All arena LEDs arranged serially, legacy mode
+## "PARALLEL":  Arena decomposed into 8 subpanels that may be addressed separately
+##              for better performance
+## "DUPLICATE": All subpanels are sent identical information (limits screen size
+##              to 16x16 pixels)
+global MODE = "SERIAL"
+
+## RASPBERRY GPIO SETUP
+## see https://sourceforge.net/p/raspberry-gpio-python/wiki/BasicUsage/
+
+if MODE != "TEXT":
+    GPIO.cleanup()           #XXX Call this again at the end?
+    GPIO.setmode(GPIO.BCM)   #XXX Wouldn't BOARD be better? (higher-level)
+    #GPIO.setwarnings(False) #XXX I don't like disabling warnings by default...
+    GPIO.setup(25, GPIO.OUT) #select parallel or serial mode
+
+if MODE == "SERIAL":
+    GPIO.output(25,GPIO.HIGH)
+elif MODE == "PARALLEL" or MODE == "DUPLICATE":
+    GPIO.output(25,GPIO.LOW)
+
+## TODO I somehow need to figure out which GPIO pins correspond to which
+## panels, so I can switch them on or off as needed
+## (duplicate mode -> all panels always on)
+    
+#TODO The next lines were just copied from Keram...
+#GPIOs for stimedent and stimstart/end
+GPIO.setup(26, GPIO.OUT)
+GPIO.setup(19, GPIO.OUT)
+GPIO.output(26,GPIO.LOW)
+GPIO.output(19,GPIO.LOW)
 
 ## LED STRIP SETUP
 
-global height, width
-height = 16 #default: 16
-width = 128 #default: 128
+## Arena dimensions in pixels/LEDs
+global height, width, npanels
+height = 16
+width = 128
+npanels = 8
 
 global strip
 strip = Adafruit_DotStar(height*width, 2000000)

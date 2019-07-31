@@ -9,6 +9,7 @@
 ### University of Wuerzburg, Center for Computational and Theoretical Biology
 ### Licensed under the terms of the MIT License
 
+import time, random ##XXX Not yet needed
 import arena
 
 def shape(coords, colour="green", flush=True):
