@@ -27,6 +27,8 @@ or individual pixels:
 ./arena.py set <x> <y> <colour>
 ```
 
+(Use `--serial` or `--parallel` before the clear/set command to choose a mode.)
+
 `house.py` is an example script that draws an image of a house.
 
 ---

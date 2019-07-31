@@ -6,11 +6,14 @@
 ### basic shapes that may be combined as needed. It also offers a simple
 ### commandline interface to control the arena lights.
 ###
-### Daniel Vedder, April 2018
+### Daniel Vedder, April 2018 <daniel.vedder@stud-mail.uni-wuerzburg.de>
 ### University of Wuerzburg, Center for Computational and Theoretical Biology
+### Licensed under the terms of the MIT License
 
 import sys, math, copy
 from dotstar import Adafruit_DotStar
+
+global MODE = "SERIAL" #options: "SERIAL" / "PARALLEL"
 
 ## LED STRIP SETUP
 
@@ -68,6 +71,7 @@ def set_pixel(x,y,colour):
 def draw_arena():
     "Draw the current state of the arena to the device."
     global height, width, colour, strip, arena, old_arena
+    #TODO This needs to be changed to accomodate the parallel mode
     for y in range(height):
         for x in range(width):
             colour = pixel(x,y)
@@ -201,9 +205,15 @@ def parseArgs():
     A rudimentary commandline interface. Usage:
     ./arena.py clear [colour]
     ./arena.py set <x> <y> <colour>
+    Use `--serial` or `--parallel` before the clear/set command to choose a mode.
     '''
-    global colours
-    if "clear" in sys.argv:
+    global MODE, colours
+    #XXX Is it sensible to set the mode via commandline?
+    if "--serial" in sys.argv:
+        MODE = "SERIAL"
+    elif "--parallel" in sys.argv:
+        MODE = "PARALLEL"
+    elif "clear" in sys.argv:
         if sys.argv[-1] in colours.keys():
             clear_arena(sys.argv[-1])
         else: clear_arena()
