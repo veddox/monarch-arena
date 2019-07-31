@@ -46,12 +46,21 @@ def clear_arena(colour="black", show=True):
     global arena, height, width
     arena = [colour] * height * width
     if show: draw_arena()
+
+def wrap_coords(x, y):
+    "If a coordinate is out of bounds, wrap around."
+    global height, width
+    if y < 0 or y >= height: y = y % height
+    if x < 0 or x >= width: x = x % width
+    return x, y
     
-def pixel_id(x, y):
+def pixel_id(x, y, toroidal=True):
     "Get the LED ID of a given set of coordinates"
+    #toroidal: if true, treat the display as a torus and wrap around
     global height, width
     if x < 0 or y < 0 or x >= width or y >= height:
-        raise Exception(str(x)+"/"+str(y)+" is out of bounds.")
+        if toroidal: x, y = wrap_coords(x, y)
+        else: raise Exception(str(x)+"/"+str(y)+" is out of bounds.")
     if x%2 == 1:
         return (x+1)*height - y - 1
     else: return x*height + y
