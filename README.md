@@ -11,11 +11,18 @@ The arenas consist of a circular drum with inlaid LED panels. <!--TODO make/mode
 
 ## Overview
 
-This repository contains a small library (`arena.py`) that interfaces with the 
-hardware (via the [Adafruit DotStar](https://github.com/adafruit/Adafruit_DotStar_Pi)
-library) and offers basic graphic functions.
+The repository contains a module (`arena.py`) that interfaces with the 
+hardware via the [Adafruit DotStar](https://github.com/adafruit/Adafruit_DotStar_Pi)
+library and offers a choice between various display modes (`SERIAL`, `PARALLEL`,
+`DUPLICATE`, `ASCII`).
 
-It also contains a range of scripts to display pre-defined images/animations.
+The `draw.py` module provides a range of shape drawing functions that can be
+used to construct experiment display setups.
+
+There are a couple of scripts to display pre-defined images/animations:
+
+* `house.py` is an example script that draws an image of a house
+* *work in progress*
 
 ## Usage
 
@@ -28,8 +35,6 @@ or individual pixels:
 ```
 
 (Use `--serial` or `--parallel` before the clear/set command to choose a mode.)
-
-`house.py` is an example script that draws an image of a house.
 
 ---
 
