@@ -20,9 +20,9 @@ from dotstar import Adafruit_DotStar #https://github.com/adafruit/Adafruit_DotSt
 ## "PARALLEL":  Arena decomposed into 8 subpanels that may be addressed separately
 ##              for better performance
 ## "DUPLICATE": All subpanels are sent identical information (limits screen size
-##              to 16x16 pixels)
+##              to 16x16 pixels but minimises time delays)
 global MODE
-MODE = "SERIAL"
+MODE = "SERIAL" #for backward compatibility; parallel would be more sensible
 
 
 ## RASPBERRY GPIO SETUP
@@ -32,8 +32,13 @@ MODE = "SERIAL"
 global panels
 panels = (5,6,13,19,26,16,20,21)
 
-# Initialise GPIO
-if MODE != "TEXT":
+##TODO The rest of the initialisation must be put in a function, so it can be
+## repeated when the mode is changed by the user
+
+def init_GPIO():
+    "(Re)initialise the Raspberry Pi GPIO pins"
+    global panels
+    if MODE == "TEXT": return
     GPIO.setmode(GPIO.BCM)   #XXX Wouldn't BOARD be better? (higher-level)
     for p in panels:
         #make sure we're starting with a blank slate
@@ -44,21 +49,29 @@ if MODE != "TEXT":
     GPIO.setup(25, GPIO.OUT) #used to select parallel or serial mode
     for p in panels:
         GPIO.setup(p, GPIO.OUT)
+    # Toggle the hardware mode
+    if MODE == "SERIAL":
+        GPIO.output(25,GPIO.HIGH)
+    elif MODE == "PARALLEL" or MODE == "DUPLICATE":
+        GPIO.output(25,GPIO.LOW)
+    # Set up the panel pins
+    if MODE == "SERIAL" or MODE == "DUPLICATE":
+        for p in panels:
+            GPIO.output(p, GPIO.HIGH)
+    elif MODE == "PARALLEL":
+        for p in panels:
+            GPIO.output(p, GPIO.LOW)
 
-# Toggle the hardware mode
-if MODE == "SERIAL":
-    GPIO.output(25,GPIO.HIGH)
-elif MODE == "PARALLEL" or MODE == "DUPLICATE":
-    GPIO.output(25,GPIO.LOW)
-
-# Set up the panel pins
-if MODE == "SERIAL" or MODE == "DUPLICATE":
-    for p in panels:
-        GPIO.output(p, GPIO.HIGH)
-else:
-    for p in panels:
-        GPIO.output(p, GPIO.LOW)
-    
+init_GPIO() #should be initialised when module first loads
+                
+def set_mode(new_mode):
+    "Change the output mode to one of 'TEXT', 'SERIAL', 'PARALLEL', 'DUPLICATE'"
+    global MODE
+    if new_mode not in ("TEXT", "SERIAL", "PARALLEL", "DUPLICATE"):
+        raise Exception("Invalid mode "+new_mode)
+    else:
+        MODE = new_mode
+        init_GPIO()
 
 ## LED STRIP SETUP
 
@@ -127,7 +140,28 @@ def set_pixel(x,y,colour):
     arena[pixel_id(x,y)] = colour
 
 def draw_arena():
-    "Draw the current state of the arena to the device."
+    "Output the current state of the arena"
+    global MODE
+    if MODE == "TEXT":
+        print_arena()
+    elif MODE == "SERIAL":
+        draw_arena_serial()
+    elif MODE == "PARALLEL":
+        draw_arena_parallel()
+    elif MODE == "DUPLICATE":
+        draw_arena_duplicate()
+    
+def print_arena():
+    "Print out a text representation of the current state of the arena."
+    global height, width, colours
+    for y in range(height):
+        for x in range(width):
+            sys.stdout.write(colours[pixel(x,y)][1])
+        sys.stdout.write('\n')
+        sys.stdout.flush()
+
+def draw_arena_serial():
+    "Draw the current state of the arena to the device in serial mode"
     global height, width, colour, strip, arena, old_arena
     #TODO This needs to be changed to accomodate the parallel mode
     for y in range(height):
@@ -138,15 +172,14 @@ def draw_arena():
                 strip.setPixelColor(pixel_id(x,y), colours[pixel(x,y)][0])
     old_arena = copy.copy(arena)
     strip.show()
-    
-def print_arena():
-    "Print out a text representation of the current state of the arena."
-    global height, width, colours
-    for y in range(height):
-        for x in range(width):
-            sys.stdout.write(colours[pixel(x,y)][1])
-        sys.stdout.write('\n')
-        sys.stdout.flush()
+
+def draw_arena_parallel():
+    #TODO
+    pass
+
+def draw_arena_duplicate():
+    #TODO
+    pass
 
 
 ## COMMANDLINE INTERFACE

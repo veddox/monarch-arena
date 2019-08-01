@@ -7,8 +7,8 @@ at the Department for Behavioural Physiology and Sociobiology
 ([Zoo2](https://www.biozentrum.uni-wuerzburg.de/en/zoo2/research/el-jundi-lab/)), 
 University of Würzburg.
 
-The arenas consist of a circular drum with inlaid LED panels.
-(8x Adafruit Dotstar 16x16 pixel APA102 RGB LED matrix)
+The arenas consist of a circular drum with inlaid LED panels
+(*8x Adafruit Dotstar 16x16 pixel APA102 RGB LED matrix*).
 
 ## Overview
 
@@ -37,6 +37,10 @@ or individual pixels:
 
 <!--obsolete-->
 (Use `--serial` or `--parallel` before the clear/set command to choose a mode.)
+
+**NOTE:** If you're running this on a Raspberry Pi, delete the `RPi` directory
+and the `dotstar.py` module. These are mockups used during development - you will
+need the real versions installed!
 
 ---
 
