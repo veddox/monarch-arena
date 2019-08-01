@@ -21,32 +21,44 @@ from dotstar import Adafruit_DotStar #https://github.com/adafruit/Adafruit_DotSt
 ##              for better performance
 ## "DUPLICATE": All subpanels are sent identical information (limits screen size
 ##              to 16x16 pixels)
-global MODE = "SERIAL"
+global MODE
+MODE = "SERIAL"
+
 
 ## RASPBERRY GPIO SETUP
 ## see https://sourceforge.net/p/raspberry-gpio-python/wiki/BasicUsage/
 
-if MODE != "TEXT":
-    GPIO.cleanup()           #XXX Call this again at the end?
-    GPIO.setmode(GPIO.BCM)   #XXX Wouldn't BOARD be better? (higher-level)
-    #GPIO.setwarnings(False) #XXX I don't like disabling warnings by default...
-    GPIO.setup(25, GPIO.OUT) #select parallel or serial mode
+# The GPIO pin numbers used by the eight panels
+global panels
+panels = (5,6,13,19,26,16,20,21)
 
+# Initialise GPIO
+if MODE != "TEXT":
+    GPIO.setmode(GPIO.BCM)   #XXX Wouldn't BOARD be better? (higher-level)
+    for p in panels:
+        #make sure we're starting with a blank slate
+        if GPIO.gpio_func(p) != GPIO.IN:
+            GPIO.cleanup()   #XXX Call this again at the end?
+            break
+    #GPIO.setwarnings(False) #XXX I don't like disabling warnings by default...
+    GPIO.setup(25, GPIO.OUT) #used to select parallel or serial mode
+    for p in panels:
+        GPIO.setup(p, GPIO.OUT)
+
+# Toggle the hardware mode
 if MODE == "SERIAL":
     GPIO.output(25,GPIO.HIGH)
 elif MODE == "PARALLEL" or MODE == "DUPLICATE":
     GPIO.output(25,GPIO.LOW)
 
-## TODO I somehow need to figure out which GPIO pins correspond to which
-## panels, so I can switch them on or off as needed
-## (duplicate mode -> all panels always on)
+# Set up the panel pins
+if MODE == "SERIAL" or MODE == "DUPLICATE":
+    for p in panels:
+        GPIO.output(p, GPIO.HIGH)
+else:
+    for p in panels:
+        GPIO.output(p, GPIO.LOW)
     
-#TODO The next lines were just copied from Keram...
-#GPIOs for stimedent and stimstart/end
-GPIO.setup(26, GPIO.OUT)
-GPIO.setup(19, GPIO.OUT)
-GPIO.output(26,GPIO.LOW)
-GPIO.output(19,GPIO.LOW)
 
 ## LED STRIP SETUP
 
@@ -69,6 +81,7 @@ colours = {"red":(strip.Color(0, 15, 0), "R"),
            "magenta":(strip.Color(0, 5, 7), "M"),
            "yellow":(strip.Color(10, 10, 0), "Y"),
            "cyan":(strip.Color(10, 0, 10), "C")}
+
 
 ## ARENA DEFINITIONS
 
@@ -105,6 +118,7 @@ def pixel(x,y):
     global arena
     return arena[pixel_id(x,y)]
     
+
 ## DRAWING FUNCTIONS
 
 def set_pixel(x,y,colour):
@@ -134,6 +148,7 @@ def print_arena():
         sys.stdout.write('\n')
         sys.stdout.flush()
 
+
 ## COMMANDLINE INTERFACE
 
 def parseArgs():
@@ -144,7 +159,7 @@ def parseArgs():
     Use `--serial` or `--parallel` before the clear/set command to choose a mode.
     '''
     global MODE, colours
-    #XXX Is it sensible to set the mode via commandline?
+    #FIXME change mode selectors to `--mode <m>` format
     if "--serial" in sys.argv:
         MODE = "SERIAL"
     elif "--parallel" in sys.argv:

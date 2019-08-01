@@ -15,7 +15,7 @@ The arenas consist of a circular drum with inlaid LED panels.
 The repository contains a module (`arena.py`) that interfaces with the 
 hardware via the [Adafruit DotStar](https://github.com/adafruit/Adafruit_DotStar_Pi)
 library and offers a choice between various display modes (`SERIAL`, `PARALLEL`,
-`DUPLICATE`, `ASCII`).
+`DUPLICATE`, `TEXT`).
 
 The `draw.py` module provides a range of shape drawing functions that can be
 used to construct experiment display setups.
