@@ -2,11 +2,12 @@
 
 ## Core
 
-- implement TEXT mode
-
 - implement PARALLEL mode
 
 - implement DUPLICATE mode
+
+- change to GPL license (compatibility with Adafruit)
+
 
 ## Extended
 

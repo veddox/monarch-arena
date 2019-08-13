@@ -10,7 +10,7 @@
 ### University of Wuerzburg, Center for Computational and Theoretical Biology
 ### Licensed under the terms of the MIT License
 
-import sys, math, copy
+import sys, copy
 import RPi.GPIO as GPIO              #https://pypi.org/project/RPi.GPIO/
 from dotstar import Adafruit_DotStar #https://github.com/adafruit/Adafruit_DotStar_Pi
 
@@ -22,7 +22,7 @@ from dotstar import Adafruit_DotStar #https://github.com/adafruit/Adafruit_DotSt
 ## "DUPLICATE": All subpanels are sent identical information (limits screen size
 ##              to 16x16 pixels but minimises time delays)
 global MODE
-MODE = "SERIAL" #for backward compatibility; parallel would be more sensible
+MODE = "SERIAL" #for backward compatibility; PARALLEL would be a more sensible default
 
 
 ## RASPBERRY GPIO SETUP
@@ -32,12 +32,9 @@ MODE = "SERIAL" #for backward compatibility; parallel would be more sensible
 global panels
 panels = (5,6,13,19,26,16,20,21)
 
-##TODO The rest of the initialisation must be put in a function, so it can be
-## repeated when the mode is changed by the user
-
 def init_GPIO():
     "(Re)initialise the Raspberry Pi GPIO pins"
-    global panels
+    global MODE, panels
     if MODE == "TEXT": return
     GPIO.setmode(GPIO.BCM)   #XXX Wouldn't BOARD be better? (higher-level)
     for p in panels:
@@ -86,10 +83,10 @@ strip = Adafruit_DotStar(height*width, 2000000)
 strip.begin()
 
 global colours
-colours = {"red":(strip.Color(0, 15, 0), "R"),
+colours = {"black":(strip.Color(0, 0, 0), "-"),
+           "red":(strip.Color(0, 15, 0), "R"),
            "green":(strip.Color(1, 0, 0), "G"),
            "blue":(strip.Color(0, 0, 1), "B"),
-           "black":(strip.Color(0, 0, 0), "-"),
            "orange":(strip.Color(2,5,0), "O"),
            "magenta":(strip.Color(0, 5, 7), "M"),
            "yellow":(strip.Color(10, 10, 0), "Y"),
@@ -99,11 +96,12 @@ colours = {"red":(strip.Color(0, 15, 0), "R"),
 ## ARENA DEFINITIONS
 
 global arena, old_arena
+#XXX change arena to an array of ints to save space?
 arena = ["black"] * height * width
 old_arena = copy.copy(arena)
 
 def clear_arena(colour="black", show=True):
-    "Reset the arena to a given colour (default: off)"
+    "Reset the arena to a given colour (default: black/off)"
     global arena, height, width
     arena = [colour] * height * width
     if show: draw_arena()

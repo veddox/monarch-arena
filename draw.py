@@ -9,7 +9,7 @@
 ### University of Wuerzburg, Center for Computational and Theoretical Biology
 ### Licensed under the terms of the MIT License
 
-import time, random ##XXX Not yet needed
+import math, time, random ##XXX the latter two are not yet needed
 import arena
 
 def shape(coords, colour="green", flush=True):
@@ -20,7 +20,7 @@ def shape(coords, colour="green", flush=True):
     '''
     for c in coords:
         arena.set_pixel(c[0], c[1], colour)
-    if flush: draw_arena()
+    if flush: arena.draw_arena()
 
 ## SHAPE DEFINITIONS
 ## A shape is a list of coordinate tuples whose pixels are to be drawn
