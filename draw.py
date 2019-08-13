@@ -7,7 +7,7 @@
 ###
 ### Daniel Vedder, 2018-2019 <daniel.vedder@stud-mail.uni-wuerzburg.de>
 ### University of Wuerzburg, Center for Computational and Theoretical Biology
-### Licensed under the terms of the MIT License
+### Licensed under the terms of the GNU GPLv3
 
 import math, time, random ##XXX the latter two are not yet needed
 import arena

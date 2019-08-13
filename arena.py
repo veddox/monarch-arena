@@ -8,7 +8,7 @@
 ###
 ### Daniel Vedder, 2018-2019 <daniel.vedder@stud-mail.uni-wuerzburg.de>
 ### University of Wuerzburg, Center for Computational and Theoretical Biology
-### Licensed under the terms of the MIT License
+### Licensed under the terms of the GNU GPLv3
 
 import sys, copy
 import RPi.GPIO as GPIO              #https://pypi.org/project/RPi.GPIO/
@@ -16,13 +16,13 @@ from dotstar import Adafruit_DotStar #https://github.com/adafruit/Adafruit_DotSt
 
 ## The mode determines which output device is chosen and how this is treated.
 ## "TEXT":      Print an ASCII representation to STDOUT (during development)
-## "SERIAL":    All arena LEDs arranged serially, legacy mode
+## "SERIAL":    All arena LEDs arranged serially, legacy default mode
 ## "PARALLEL":  Arena decomposed into 8 subpanels that may be addressed separately
 ##              for better performance
 ## "DUPLICATE": All subpanels are sent identical information (limits screen size
 ##              to 16x16 pixels but minimises time delays)
 global MODE
-MODE = "SERIAL" #for backward compatibility; PARALLEL would be a more sensible default
+MODE = "SERIAL" #DO NOT CHANGE THIS DIRECTLY! (use `set_mode()`)
 
 
 ## RASPBERRY GPIO SETUP
@@ -72,32 +72,27 @@ def init_GPIO():
             GPIO.output(p, GPIO.HIGH)
 
 init_GPIO() #should be initialised when module first loads
-                
-def set_mode(new_mode):
-    "Change the output mode to one of 'TEXT', 'SERIAL', 'PARALLEL', 'DUPLICATE'"
-    global MODE
-    if new_mode not in ("TEXT", "SERIAL", "PARALLEL", "DUPLICATE"):
-        raise Exception("Invalid mode "+new_mode)
-    else:
-        MODE = new_mode
-        init_GPIO()
 
 ## LED STRIP SETUP
 
 ## Arena dimensions in pixels/LEDs
 global height, width, pwidth, npanels
 
-height = 16
-pwidth = 16 # panel width
+def init_dimensions():
+    "(Re)define the arena dimensions, depending on the mode"
+    global height, width, pwidth, npanels
+    height = 16
+    pwidth = 16 # panel width
+    if MODE == "SERIAL": npanels = 1
+    else: npanels = 8
+    if MODE == "DUPLICATE": width = pwidth
+    else: width = pwidth*npanels
 
-if MODE == "SERIAL": npanels = 1
-else: npanels = 8
-
-if MODE == "DUPLICATE": width = pwidth
-else: width = pwdith*npanels
-
+init_dimensions()
+    
 ## Create an Adafruit strip object for each panel
 global strips
+strips = []
 for s in range(npanels):
     strips.append(Adafruit_DotStar(height*pwidth,
                                    panels[s], clock_pins[s], #XXX see above
@@ -229,7 +224,17 @@ def draw_arena_duplicate():
         s.show()
 
 
-## COMMANDLINE INTERFACE
+## UTILITY FUNCTIONS
+                
+def set_mode(new_mode):
+    "Change the output mode to one of 'TEXT', 'SERIAL', 'PARALLEL', 'DUPLICATE'"
+    global MODE
+    if new_mode not in ("TEXT", "SERIAL", "PARALLEL", "DUPLICATE"):
+        raise Exception("Invalid mode "+new_mode)
+    else:
+        MODE = new_mode
+        init_GPIO()
+        init_dimensions()
 
 def parseArgs():
     '''

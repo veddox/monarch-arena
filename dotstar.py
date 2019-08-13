@@ -8,6 +8,9 @@ class Adafruit_DotStar():
     def __init__(self, length, hertz):
         pass
 
+    def __init__(self, length, datapin, clockpin, hertz):
+        pass
+
     def begin(self):
         pass
 

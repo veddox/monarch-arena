@@ -3,16 +3,14 @@
 ### Draws a house with a tree :-)
 ###
 ### Daniel Vedder, April 2018
-
-
-##TODO Check if this still works
+### Licensed under the terms of the GNU GPLv3
 
 import arena
 import draw
 
-arena.MODE = "TEXT"
+arena.set_mode("TEXT")
 
-arena.clear_arena("blue") #sky #XXX Change to "blue" for use in the actual arena
+arena.clear_arena("black") #sky #XXX Change to "blue" for use in the actual arena
 
 # Note the order of drawing! (Some shapes overlap)
 draw.shape(draw.rectangle(24,15,72,15,72,7,24,7,True), colour="orange", flush=False) #main house

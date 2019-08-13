@@ -2,9 +2,9 @@
 
 ## Core
 
-- implement PARALLEL mode
+- check if pin setup is correct (and get clock pin numbers)
 
-- implement DUPLICATE mode
+- test PARALLEL and DUPLICATE modes
 
 
 ## Extended
@@ -15,7 +15,5 @@
 
 
 ## Other
-
-- change to GPL license (compatibility with Adafruit)
 
 - update README
