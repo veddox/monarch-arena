@@ -38,6 +38,8 @@ or individual pixels:
 <!--obsolete-->
 (Use `--serial` or `--parallel` before the clear/set command to choose a mode.)
 
+`draw.py` can be imported and used in other scripts, see `house.py` for examples.
+
 **NOTE:** If you're running this on a Raspberry Pi, delete the `RPi` directory
 and the `dotstar.py` module. These are mockups used during development - you will
 need the real versions installed!
@@ -45,4 +47,4 @@ need the real versions installed!
 ---
 
 *&copy; 2018-19 Daniel Vedder, University of Würzburg*  
-*Licensed under the terms of the MIT License.*
+*Licensed under the terms of the GNU GPLv3.*
