@@ -100,19 +100,19 @@ else: width = pwdith*npanels
 global strips
 for s in range(npanels):
     strips.append(Adafruit_DotStar(height*pwidth,
-                                   panels[s], clock_pins[s],
+                                   panels[s], clock_pins[s], #XXX see above
                                    2000000)) # 2MHz
     strips[s].begin()
 
 global colours
-colours = {"black":(strip.Color(0, 0, 0), "-"),
-           "red":(strip.Color(0, 15, 0), "R"),
-           "green":(strip.Color(1, 0, 0), "G"),
-           "blue":(strip.Color(0, 0, 1), "B"),
-           "orange":(strip.Color(2,5,0), "O"),
-           "magenta":(strip.Color(0, 5, 7), "M"),
-           "yellow":(strip.Color(10, 10, 0), "Y"),
-           "cyan":(strip.Color(10, 0, 10), "C")}
+colours = {"black":(strips[0].Color(0, 0, 0), "-"),
+           "red":(strips[0].Color(0, 15, 0), "R"),
+           "green":(strips[0].Color(1, 0, 0), "G"),
+           "blue":(strips[0].Color(0, 0, 1), "B"),
+           "orange":(strips[0].Color(2,5,0), "O"),
+           "magenta":(strips[0].Color(0, 5, 7), "M"),
+           "yellow":(strips[0].Color(10, 10, 0), "Y"),
+           "cyan":(strips[0].Color(10, 0, 10), "C")}
 
 
 ## ARENA DEFINITIONS
@@ -193,12 +193,40 @@ def draw_arena_serial():
     strips[0].show()
 
 def draw_arena_parallel():
-    #TODO
-    pass
+    "Draw the arena, taking advantage of the parallel mode"
+    #TODO needs to be tested
+    global height, width, pwidth, npanels, colour, strips, arena, old_arena
+    changed_panels = [False] * npanels
+    panel = 0
+    for x in range(width):
+        if x > 0 and x%pwidth == 0:
+            panel = panel + 1
+        for y in range(height):
+            colour = pixel(x,y)
+            old_colour = old_arena[pixel_id(x,y)]
+            if colour != old_colour:
+                strips[panel].setPixelColor(pixel_id(x%pwidth,y),
+                                            colours[pixel(x,y)][0])
+                changed_panels[panel] = True
+    old_arena = copy.copy(arena)
+    # only update panels that have actually changed
+    for p in range(len(changed_panels)):
+        if changed_panels[p]: strips[p].show()
 
 def draw_arena_duplicate():
-    #TODO
-    pass
+    "Draw the current state of the arena, with all panels showing the same"
+    #TODO needs to be tested
+    global height, width, colour, strips, arena, old_arena
+    for y in range(height):
+        for x in range(width):
+            colour = pixel(x,y)
+            old_colour = old_arena[pixel_id(x,y)]
+            if colour != old_colour:
+                for s in strips:
+                    s.setPixelColor(pixel_id(x,y), colours[pixel(x,y)][0])
+    old_arena = copy.copy(arena)
+    for s in strips:
+        s.show()
 
 
 ## COMMANDLINE INTERFACE
