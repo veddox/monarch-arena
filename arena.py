@@ -28,36 +28,48 @@ MODE = "SERIAL" #for backward compatibility; PARALLEL would be a more sensible d
 ## RASPBERRY GPIO SETUP
 ## see https://sourceforge.net/p/raspberry-gpio-python/wiki/BasicUsage/
 
-# The GPIO pin numbers used by the eight panels
-global panels
-panels = (5,6,13,19,26,16,20,21)
+# The pin used by the hardware to toggle between parallel and serial mode
+global toggle
+toggle = 25
+
+# The GPIO data & clock pin numbers used by the eight panels
+#FIXME find out clock pin numbers
+
+#XXX I'm not sure I've understood this correctly. Are the pins given in `panels`
+# merely used to turn an individual panel on/off? Or are they also the output
+# pins needed by the Adafruit library? If the former, I need a whole other
+# set of pin numbers to initialise the Adafruit strips, as well as still needing
+# the clock pins...
+
+global panels, clock_pins
+panels = (5, 6, 13, 19, 26, 16, 20, 21)
+clock_pins = (0, 0, 0, 0, 0, 0, 0, 0)
 
 def init_GPIO():
     "(Re)initialise the Raspberry Pi GPIO pins"
-    global MODE, panels
+    global MODE, toggle, panels, clock_pins
     if MODE == "TEXT": return
+    pins = panels + clock_pins
     GPIO.setmode(GPIO.BCM)   #XXX Wouldn't BOARD be better? (higher-level)
-    for p in panels:
+    for p in pins:
         #make sure we're starting with a blank slate
         if GPIO.gpio_func(p) != GPIO.IN:
             GPIO.cleanup()   #XXX Call this again at the end?
             break
     #GPIO.setwarnings(False) #XXX I don't like disabling warnings by default...
-    GPIO.setup(25, GPIO.OUT) #used to select parallel or serial mode
-    for p in panels:
+    GPIO.setup(toggle, GPIO.OUT) #used to select parallel or serial mode
+    for p in pins:
         GPIO.setup(p, GPIO.OUT)
+        GPIO.output(p, GPIO.LOW)
     # Toggle the hardware mode
     if MODE == "SERIAL":
-        GPIO.output(25,GPIO.HIGH)
+        GPIO.output(toggle, GPIO.HIGH)
     elif MODE == "PARALLEL" or MODE == "DUPLICATE":
-        GPIO.output(25,GPIO.LOW)
+        GPIO.output(toggle, GPIO.LOW)
     # Set up the panel pins
     if MODE == "SERIAL" or MODE == "DUPLICATE":
         for p in panels:
             GPIO.output(p, GPIO.HIGH)
-    elif MODE == "PARALLEL":
-        for p in panels:
-            GPIO.output(p, GPIO.LOW)
 
 init_GPIO() #should be initialised when module first loads
                 
@@ -73,14 +85,24 @@ def set_mode(new_mode):
 ## LED STRIP SETUP
 
 ## Arena dimensions in pixels/LEDs
-global height, width, npanels
-height = 16
-width = 128
-npanels = 8
+global height, width, pwidth, npanels
 
-global strip
-strip = Adafruit_DotStar(height*width, 2000000)
-strip.begin()
+height = 16
+pwidth = 16 # panel width
+
+if MODE == "SERIAL": npanels = 1
+else: npanels = 8
+
+if MODE == "DUPLICATE": width = pwidth
+else: width = pwdith*npanels
+
+## Create an Adafruit strip object for each panel
+global strips
+for s in range(npanels):
+    strips.append(Adafruit_DotStar(height*pwidth,
+                                   panels[s], clock_pins[s],
+                                   2000000)) # 2MHz
+    strips[s].begin()
 
 global colours
 colours = {"black":(strip.Color(0, 0, 0), "-"),
@@ -160,16 +182,15 @@ def print_arena():
 
 def draw_arena_serial():
     "Draw the current state of the arena to the device in serial mode"
-    global height, width, colour, strip, arena, old_arena
-    #TODO This needs to be changed to accomodate the parallel mode
+    global height, width, colour, strips, arena, old_arena
     for y in range(height):
         for x in range(width):
             colour = pixel(x,y)
             old_colour = old_arena[pixel_id(x,y)]
             if colour != old_colour:
-                strip.setPixelColor(pixel_id(x,y), colours[pixel(x,y)][0])
+                strips[0].setPixelColor(pixel_id(x,y), colours[pixel(x,y)][0])
     old_arena = copy.copy(arena)
-    strip.show()
+    strips[0].show()
 
 def draw_arena_parallel():
     #TODO

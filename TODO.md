@@ -6,8 +6,6 @@
 
 - implement DUPLICATE mode
 
-- change to GPL license (compatibility with Adafruit)
-
 
 ## Extended
 
@@ -15,3 +13,9 @@
 
 - Optical flow pattern
 
+
+## Other
+
+- change to GPL license (compatibility with Adafruit)
+
+- update README
