@@ -35,10 +35,8 @@ or individual pixels:
 ./arena.py set <x> <y> <colour>
 ```
 
-<!--obsolete-->
-(Use `--serial` or `--parallel` before the clear/set command to choose a mode.)
-
-`draw.py` can be imported and used in other scripts, see `house.py` for examples.
+Use `arena.set_mode()` to choose a mode. To create displays and animations, import
+the `arena` and `draw` modules (see the example in `house.py`).
 
 **NOTE:** If you're running this on a Raspberry Pi, delete the `RPi` directory
 and the `dotstar.py` module. These are mockups used during development - you will

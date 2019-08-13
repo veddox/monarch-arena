@@ -228,6 +228,7 @@ def draw_arena_duplicate():
                 
 def set_mode(new_mode):
     "Change the output mode to one of 'TEXT', 'SERIAL', 'PARALLEL', 'DUPLICATE'"
+    #NB: Call this instead of setting MODE directly!
     global MODE
     if new_mode not in ("TEXT", "SERIAL", "PARALLEL", "DUPLICATE"):
         raise Exception("Invalid mode "+new_mode)
@@ -241,14 +242,12 @@ def parseArgs():
     A rudimentary commandline interface. Usage:
     ./arena.py clear [colour]
     ./arena.py set <x> <y> <colour>
-    Use `--serial` or `--parallel` before the clear/set command to choose a mode.
     '''
     global MODE, colours
-    #FIXME change mode selectors to `--mode <m>` format
-    if "--serial" in sys.argv:
-        MODE = "SERIAL"
-    elif "--parallel" in sys.argv:
-        MODE = "PARALLEL"
+    if "--help" in sys.argv:
+        print "Usage:"
+        print "\t./arena.py clear [colour]"
+        print "\t./arena.py set <x> <y> <colour>"
     elif "clear" in sys.argv:
         if sys.argv[-1] in colours.keys():
             clear_arena(sys.argv[-1])

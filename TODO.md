@@ -9,11 +9,8 @@
 
 ## Extended
 
+- write an animation function?
+
 - Landscape pattern
 
 - Optical flow pattern
-
-
-## Other
-
-- update README
