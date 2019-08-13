@@ -12,7 +12,7 @@
 import math, time, random ##XXX the latter two are not yet needed
 import arena
 
-def shape(coords, colour="green", flush=True):
+def shape(coords, colour="green", flush=False):
     '''
     Draw a shape from a list of coordinates (as produced by the shape functions).
     colour: The colour to use
@@ -48,6 +48,7 @@ def vertical_line(x, y1, y2):
     return shape
 
 def diagonal_line(x1, y1, x2, y2):
+    #FIXME is this broken? cf. `landscape.py`
     if x2 < x1:
         x1,x2 = x2, x1
         y1,y2 = y2, y1
@@ -66,11 +67,16 @@ def diagonal_line(x1, y1, x2, y2):
 
 def polygon(corners):
     "A polygon connecting each set of coordinates passed to it via straight lines"
-    shape = line(corners[len(corners)-1][0], corners[len(corners)-1][1],
-                  corners[0][0], corners[0][1])
+    #TODO add `filled` option (see Lisp library)
+    shape = line(corners[len(corners)-1][0],
+                 corners[len(corners)-1][1],
+                 corners[0][0],
+                 corners[0][1])
     for c in range(len(corners)-1):
-        shape.extend(line(corners[c][0], corners[c][1],
-                          corners[c+1][0], corners[c+1][1]))
+        shape.extend(line(corners[c][0],
+                          corners[c][1],
+                          corners[c+1][0],
+                          corners[c+1][1]))
     return shape
 
 def triangle(x1, y1, x2, y2, x3, y3):
