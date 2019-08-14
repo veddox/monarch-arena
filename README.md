@@ -8,7 +8,8 @@ at the Department for Behavioural Physiology and Sociobiology
 University of Würzburg.
 
 The arenas consist of a circular drum with inlaid LED panels
-(*8x Adafruit Dotstar 16x16 pixel APA102 RGB LED matrix*).
+(*8x Adafruit Dotstar 16x16 pixel APA102 RGB LED matrix*). See the `hardware.md`
+file for more details.
 
 ## Overview
 
