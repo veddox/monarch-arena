@@ -33,40 +33,34 @@ global toggle
 toggle = 25
 
 # The GPIO data & clock pin numbers used by the eight panels
-#FIXME find out clock pin numbers
 
-#XXX I'm not sure I've understood this correctly. Are the pins given in `panels`
-# merely used to turn an individual panel on/off? Or are they also the output
-# pins needed by the Adafruit library? If the former, I need a whole other
-# set of pin numbers to initialise the Adafruit strips, as well as still needing
-# the clock pins...
+# FIXME Problem: the arena only has a single data/clock channel duo. Ergo, we
+# can only have a single Dotstar strip. So I basically need to rewrite the
+# entire architecture here...
 
-global panels, clock_pins
+global panels
 panels = (5, 6, 13, 19, 26, 16, 20, 21)
-clock_pins = (0, 0, 0, 0, 0, 0, 0, 0)
 
 def init_GPIO():
     "(Re)initialise the Raspberry Pi GPIO pins"
-    global MODE, toggle, panels, clock_pins
+    global MODE, toggle, panels
     if MODE == "TEXT": return
-    pins = panels + clock_pins
     GPIO.setmode(GPIO.BCM)   #XXX Wouldn't BOARD be better? (higher-level)
-    for p in pins:
+    for p in panels:
         #make sure we're starting with a blank slate
         if GPIO.gpio_func(p) != GPIO.IN:
             GPIO.cleanup()   #XXX Call this again at the end?
             break
     #GPIO.setwarnings(False) #XXX I don't like disabling warnings by default...
     GPIO.setup(toggle, GPIO.OUT) #used to select parallel or serial mode
-    for p in pins:
+    GPIO.output(toggle, GPIO.LOW)
+    for p in panels:
         GPIO.setup(p, GPIO.OUT)
         GPIO.output(p, GPIO.LOW)
-    # Toggle the hardware mode
+    # Toggle the hardware mode if necessary
     if MODE == "SERIAL":
         GPIO.output(toggle, GPIO.HIGH)
-    elif MODE == "PARALLEL" or MODE == "DUPLICATE":
-        GPIO.output(toggle, GPIO.LOW)
-    # Set up the panel pins
+    # Turn on the panel pins if necessary
     if MODE == "SERIAL" or MODE == "DUPLICATE":
         for p in panels:
             GPIO.output(p, GPIO.HIGH)
@@ -81,23 +75,24 @@ global height, width, pwidth, npanels
 def init_dimensions():
     "(Re)define the arena dimensions, depending on the mode"
     global height, width, pwidth, npanels
+    # defaults
     height = 16
     pwidth = 16 # panel width
-    if MODE == "SERIAL": npanels = 1
-    else: npanels = 8
-    if MODE == "DUPLICATE": width = pwidth
-    else: width = pwidth*npanels
+    npanels = 8
+    # special cases
+    if MODE == "SERIAL" or MODE == "DUPLICATE":
+        if MODE == "SERIAL":
+            pwidth = pwidth * npanels
+        npanels = 1
+    # total width
+    width = pwidth * npanels
 
 init_dimensions()
     
-## Create an Adafruit strip object for each panel
-global strips
-strips = []
-for s in range(npanels):
-    strips.append(Adafruit_DotStar(height*pwidth,
-                                   panels[s], clock_pins[s], #XXX see above
-                                   2000000)) # 2MHz
-    strips[s].begin()
+## Create an Adafruit strip object to interface with the panels
+global strip
+strip = Adafruit_DotStar(height*pwidth, 2000000) # 2MHz
+strip.begin()
 
 global colours
 colours = {"black":(strips[0].Color(0, 0, 0), "-"),
@@ -177,21 +172,22 @@ def print_arena():
 
 def draw_arena_serial():
     "Draw the current state of the arena to the device in serial mode"
-    global height, width, colour, strips, arena, old_arena
+    global height, width, colour, strip, arena, old_arena
     for y in range(height):
         for x in range(width):
             colour = pixel(x,y)
             old_colour = old_arena[pixel_id(x,y)]
             if colour != old_colour:
-                strips[0].setPixelColor(pixel_id(x,y), colours[pixel(x,y)][0])
+                strip.setPixelColor(pixel_id(x,y), colours[pixel(x,y)][0])
     old_arena = copy.copy(arena)
-    strips[0].show()
+    strip.show()
 
 def draw_arena_parallel():
     "Draw the arena, taking advantage of the parallel mode"
     #TODO needs to be tested
-    global height, width, pwidth, npanels, colour, strips, arena, old_arena
+    global height, width, pwidth, npanels, colour, strip, arena, old_arena
     changed_panels = [False] * npanels
+    #FIXME only one panel!
     panel = 0
     for x in range(width):
         if x > 0 and x%pwidth == 0:
