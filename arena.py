@@ -107,10 +107,11 @@ colours = {"black":(strips[0].Color(0, 0, 0), "-"),
 
 ## ARENA DEFINITIONS
 
-global arena, old_arena
+global arena
 #XXX change arena to an array of ints to save space?
+#XXX Or better yet, use a byte array for maximum speed transfers
+# (see `image-pov.py` in the Adafruit library for example code)
 arena = ["black"] * height * width
-old_arena = copy.copy(arena)
 
 def clear_arena(colour="black", show=True):
     "Reset the arena to a given colour (default: black/off)"
@@ -154,12 +155,10 @@ def draw_arena():
     global MODE
     if MODE == "TEXT":
         print_arena()
-    elif MODE == "SERIAL":
-        draw_arena_serial()
     elif MODE == "PARALLEL":
         draw_arena_parallel()
-    elif MODE == "DUPLICATE":
-        draw_arena_duplicate()
+    elif MODE == "SERIAL" or MODE == "DUPLICATE":
+        draw_arena_serial()
     
 def print_arena():
     "Print out a text representation of the current state of the arena."
@@ -172,53 +171,29 @@ def print_arena():
 
 def draw_arena_serial():
     "Draw the current state of the arena to the device in serial mode"
-    global height, width, colour, strip, arena, old_arena
+    # Also works for duplicate mode (only difference: width is smaller in
+    # duplicate mode and all panel pins are on - see `init_*` functions).
+    global height, width, colour, strip, arena
     for y in range(height):
         for x in range(width):
-            colour = pixel(x,y)
-            old_colour = old_arena[pixel_id(x,y)]
-            if colour != old_colour:
-                strip.setPixelColor(pixel_id(x,y), colours[pixel(x,y)][0])
-    old_arena = copy.copy(arena)
+            strip.setPixelColor(pixel_id(x,y), colours[pixel(x,y)][0])
     strip.show()
 
 def draw_arena_parallel():
     "Draw the arena, taking advantage of the parallel mode"
     #TODO needs to be tested
-    global height, width, pwidth, npanels, colour, strip, arena, old_arena
+    #FIXME this function is currently completely broken!
+    # (due to us now only having one strip object available)
+    global height, width, pwidth, npanels, colour, strip, arena
     changed_panels = [False] * npanels
-    #FIXME only one panel!
-    panel = 0
     for x in range(width):
-        if x > 0 and x%pwidth == 0:
-            panel = panel + 1
         for y in range(height):
-            colour = pixel(x,y)
-            old_colour = old_arena[pixel_id(x,y)]
-            if colour != old_colour:
                 strips[panel].setPixelColor(pixel_id(x%pwidth,y),
                                             colours[pixel(x,y)][0])
                 changed_panels[panel] = True
-    old_arena = copy.copy(arena)
     # only update panels that have actually changed
     for p in range(len(changed_panels)):
         if changed_panels[p]: strips[p].show()
-
-def draw_arena_duplicate():
-    "Draw the current state of the arena, with all panels showing the same"
-    #TODO needs to be tested
-    global height, width, colour, strips, arena, old_arena
-    for y in range(height):
-        for x in range(width):
-            colour = pixel(x,y)
-            old_colour = old_arena[pixel_id(x,y)]
-            if colour != old_colour:
-                for s in strips:
-                    s.setPixelColor(pixel_id(x,y), colours[pixel(x,y)][0])
-    old_arena = copy.copy(arena)
-    for s in strips:
-        s.show()
-
 
 ## UTILITY FUNCTIONS
                 
