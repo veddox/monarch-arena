@@ -12,7 +12,7 @@
 import math, time, random ##XXX the latter two are not yet needed
 import arena
 
-def shape(coords, colour="green", flush=False):
+def plot(coords, colour="green", flush=False):
     '''
     Draw a shape from a list of coordinates (as produced by the shape functions).
     colour: The colour to use
@@ -119,6 +119,3 @@ def circle(center_x, center_y, radius, filled=False, quarters=[1,2,3,4]):
                 if 3 in quarters: shape.append((center_x-y, center_y+x))
                 if 4 in quarters: shape.append((center_x-y, center_y-x))
     return shape
-
-## ANIMATION FUNCTIONS
-# TODO

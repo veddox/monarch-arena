@@ -5,17 +5,16 @@
 ### University of Wuerzburg, Center for Computational and Theoretical Biology
 ### Licensed under the terms of the GNU GPLv3
 
-import arena, draw
+import arena, shape
 import time
 
 def draw_panorama(col="magenta"):
     "Draw a panorama of two triangular hills"
-    #FIXME triangles broken - is `draw.diagonal_line()`buggy?
-    arena.clear_arena("black", show=False) #TODO Change to "blue" for use in the actual arena
-    panorama = draw.line(0,15,127,15) + \
-               draw.triangle(0, 14, 10, 8, 20, 14) + \
-               draw.triangle(64, 14, 69, 5, 74, 14)
-    draw.shape(panorama, colour=col)
+    arena.clear("black", show=False) #TODO Change to "blue" for use in the actual arena
+    panorama = shape.line(0,15,127,15) + \
+               shape.triangle(0, 14, 10, 8, 20, 14) + \
+               shape.triangle(64, 14, 69, 5, 74, 14)
+    shape.plot(panorama, colour=col)
 
 def draw_movable_elements(t, x0_pixel=0, x0_strip=arena.width/2, px_foreground=True):
     '''
@@ -27,7 +26,7 @@ def draw_movable_elements(t, x0_pixel=0, x0_strip=arena.width/2, px_foreground=T
     '''
     if not px_foreground:
         arena.set_pixel(x0_pixel+t, 6, "green")
-    draw.shape(draw.line(x0_strip-t, 3, x0_strip-t, 9), "blue") #TODO change to black
+    shape.plot(shape.line(x0_strip-t, 3, x0_strip-t, 9), "blue") #TODO change to black
     if px_foreground:
         arena.set_pixel(x0_pixel+t, 6, "green")
 
@@ -43,7 +42,7 @@ def animate(ticks=-1, fps=21):
         i = i + 1 # infinity loop if ticks = -1
         draw_panorama()
         draw_movable_elements(i, px_foreground=True)
-        arena.draw_arena()
+        arena.render()
         time.sleep(1.0/fps)   
         
 if __name__ == '__main__':
