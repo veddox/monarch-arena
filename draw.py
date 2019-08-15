@@ -24,45 +24,42 @@ def shape(coords, colour="green", flush=False):
 
 ## SHAPE DEFINITIONS
 ## A shape is a list of coordinate tuples whose pixels are to be drawn
-        
+
 def line(x1, y1, x2, y2):
     "A straight line from x1/y1 to x2/y2"
+    # This is a backport to Python from my Common Lisp croatoan `shapes` extension
+    # (https://github.com/McParen/croatoan/blob/master/source/shape.lisp)
+    # The idea is to move from left to right one step at a time, calculating how
+    # many pixels we need to stack vertically at each position to get a
+    # "straight line"
+    shape = []
+    # make sure we're moving from left to right
+    if x1 > x2 or (x1 == x2 and y1 > y2):
+        x1,x2 = x2,x1
+        y1,y2 = y2,y1
+    # The slope (dy/dx) gives the vertical pixels per x-position
     if x1 == x2:
-        return vertical_line(x1, y1, y2)
-    elif y1 == y2:
-        return horizontal_line(y1, x1, x2)
-    else: return diagonal_line(x1, y1, x2, y2)
-
-def horizontal_line(y, x1, x2):
-    shape = []
-    if x2 < x1: x1,x2 = x2,x1
-    for x in range(x1, x2+1):
-        shape.append((x, y))
-    return shape
-
-def vertical_line(x, y1, y2):
-    shape = []
-    if y2 < y1: y1,y2 = y2,y1
-    for y in range(y1, y2+1):
-        shape.append((x, y))
-    return shape
-
-def diagonal_line(x1, y1, x2, y2):
-    #FIXME is this broken? cf. `landscape.py`
-    if x2 < x1:
-        x1,x2 = x2, x1
-        y1,y2 = y2, y1
-    shape = []
-    slope = (x2-x1)/(y2-y1)
-    # XXX a bit ugly, but it works
-    if abs(slope) < 1: # steep lines
-        for y in range(y1, y2+1):
-            x = int(round(x2 - ((y2-y)*slope)))
-            shape.append((x,y))
-    else: # shallow lines
-        for x in range(x1, x2+1):
-            y = int(round(y2 - ((x2-x)/slope)))
-            shape.append((x,y))
+        slope = abs(y1 - y2) #prevent division-by-zero errors
+    else: slope = float(y2-y1) / float(x2-x1)
+    # x and y are the distance from the origin (x1/y1), dy is the number of
+    # pixels to stack here, and next_x/next_y is the finished calculation of
+    # the next position
+    x = 0
+    while x1+x <= x2:
+        y = round(x*slope)
+        next_x = x1 + x
+        dy = 0
+        # stop when we have stacked sufficient vertical coordinates
+        while (abs(slope) <= 1 and dy < 1) or \
+              (abs(slope) > 1 and dy < math.ceil(abs(slope))):
+            if slope < 0: next_y = y1 + y - dy
+            else: next_y = y1 + y + dy
+            if (slope > 0 and (next_y > y2 or next_x > x2)) or \
+               (slope < 0 and (next_y < y2 or next_x > x2)):
+                break #Don't overshoot the end
+            shape.append((next_x, int(next_y)))
+            dy = dy + 1
+        x = x+1
     return shape
 
 def polygon(corners):

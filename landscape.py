@@ -5,28 +5,46 @@
 ### University of Wuerzburg, Center for Computational and Theoretical Biology
 ### Licensed under the terms of the GNU GPLv3
 
-import arena
-import draw
-
-arena.set_mode("TEXT")     #TODO change to "PARALLEL"
-arena.clear_arena("black", show=False) #TODO Change to "blue" for use in the actual arena
-
-#TODO
-# - gruener Pixel
-# - schwarzer, vertikaler Streifen
-# - werden einzeln im Kreis bewegt, mal vor, mal hintereinander
-# - 60 deg/s -> 21fps
-# - Huegelpanorama
+import arena, draw
+import time
 
 def draw_panorama(col="magenta"):
     "Draw a panorama of two triangular hills"
-    #FIXME triangles broken - is `draw.diagonal_line()`buggy?
+    arena.clear_arena("blue", show=False)
     panorama = draw.line(0,15,127,15) + \
                draw.triangle(0, 14, 10, 8, 20, 14) + \
                draw.triangle(64, 14, 69, 5, 74, 14)
     draw.shape(panorama, colour=col)
 
+def draw_movable_elements(t, x0_pixel=0, x0_strip=arena.width/2, px_foreground=True):
+    '''
+    Draw a green pixel and black vertical strip at timestep t.
+    The pixel moves clockwise, the strip ACW around the arena.
 
+    x0_pixel, x0_strip: Initial x-coordinates of the elements
+    px_foreground: Should the pixel be in the fore- or background?
+    '''
+    if not px_foreground:
+        arena.set_pixel(x0_pixel+t, 6, "green")
+    draw.shape(draw.line(x0_strip-t, 3, x0_strip-t, 9), "black")
+    if px_foreground:
+        arena.set_pixel(x0_pixel+t, 6, "green")
+
+def animate(ticks=-1, fps=21):
+    '''
+    Animate the elements at the given framerate for a set time
+    
+    ticks: number of ticks to run the animation for (-1 -> forever)
+    fps: framerate in ticks per second (default: 21fps = 60deg/s)
+    '''
+    i = 0
+    while i != ticks:
+        i = i + 1 # infinity loop if ticks = -1
+        draw_panorama()
+        draw_movable_elements(i, px_foreground=True)
+        arena.draw_arena()
+        time.sleep(1.0/fps)   
+        
 if __name__ == '__main__':
-    draw_panorama()
-    arena.draw_arena()
+    arena.set_mode("PARALLEL")
+    animate()

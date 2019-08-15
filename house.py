@@ -8,8 +8,8 @@
 import arena
 import draw
 
-arena.set_mode("TEXT") #TODO change to "PARALLEL" or "SERIAL"
-arena.clear_arena("black", show=False) #sky #XXX Change to "blue" for use in the actual arena
+arena.set_mode("PARALLEL")
+arena.clear_arena("blue", show=False) #sky
 
 # Note the order of drawing! (Some shapes overlap)
 draw.shape(draw.rectangle(24,15,72,15,72,7,24,7,True), colour="orange") #main house
