@@ -4,14 +4,12 @@
 
 - test on hardware
 
-- fix line drawing function
+- switch internal buffer to bytearray for maximum performance
 
 ## Extended
 
-- write an animation function?
+- write animation functions?
 
-- add `filled` option to `draw.polygon()`
-
-- Landscape pattern
+- check if landscape pattern is correct
 
 - Optical flow pattern
