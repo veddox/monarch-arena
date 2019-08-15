@@ -2,7 +2,7 @@
 
 ## Core
 
-- rewrite PARALLEL mode to account for the single strip
+- test on hardware
 
 - fix line drawing function
 

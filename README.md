@@ -41,8 +41,9 @@ Use `arena.set_mode()` to choose a mode. To create displays and animations, impo
 the `arena` and `draw` modules (see the example in `house.py`).
 
 **NOTE:** If you're running this on a Raspberry Pi, delete the `RPi` directory
-and the `dotstar.py` module. These are mockups used during development - you will
-need the real versions installed!
+and the `dotstar.py` module. These are mockups used during development - you 
+will need the real versions installed! (The mockups are already deleted on the 
+`production` branch, so you can just check that out.)
 
 ---
 
