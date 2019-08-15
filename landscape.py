@@ -36,7 +36,7 @@ def animate(ticks=-1, fps=21):
     Animate the elements at the given framerate for a set time
     
     ticks: number of ticks to run the animation for (-1 -> forever)
-    fps: framerate (default: 21fps = 60deg/s)
+    fps: framerate in ticks per second (default: 21fps = 60deg/s)
     '''
     i = 0
     while i != ticks:
