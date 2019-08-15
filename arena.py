@@ -16,13 +16,13 @@ from dotstar import Adafruit_DotStar #https://github.com/adafruit/Adafruit_DotSt
 
 ## The mode determines which output device is chosen and how this is treated.
 ## "TEXT":      Print an ASCII representation to STDOUT (during development)
-## "SERIAL":    All arena LEDs arranged serially, legacy default mode
+## "SERIAL":    All arena LEDs arranged serially, legacy mode
 ## "PARALLEL":  Arena decomposed into 8 subpanels that may be addressed separately
 ##              for better performance
 ## "DUPLICATE": All subpanels are sent identical information (limits screen size
 ##              to 16x16 pixels but minimises time delays)
 global MODE
-MODE = "SERIAL" #DO NOT CHANGE THIS DIRECTLY! (use `set_mode()`)
+MODE = "PARALLEL" #DO NOT CHANGE THIS DIRECTLY! (use `set_mode()`)
 
 
 ## RASPBERRY GPIO SETUP
@@ -93,7 +93,7 @@ def init_arena():
     global height, pwidth, width, npanels
     strip = Adafruit_DotStar(height*pwidth, 2000000) # 2MHz
     strip.begin()
-    #XXX For maximum speed, use a byte array of RGB values instead
+    #TODO For maximum speed, use a byte array of RGB values instead
     # (see `image-pov.py` in the Adafruit library for example code)
     arena = ["black"] * height * width
     changed_panels = [False] * npanels
@@ -112,7 +112,7 @@ colours = {"black":(strip.Color(0, 0, 0), "-"),
 
 ## ARENA FUNCTIONS
 
-def clear_arena(colour="black", show=True):
+def clear(colour="black", show=True):
     "Reset the arena to a given colour (default: black/off)"
     global arena, height, width
     arena = [colour] * height * width
@@ -160,7 +160,7 @@ def print_arena():
         sys.stdout.write('\n')
         sys.stdout.flush()
 
-def draw_arena():
+def render():
     "Output the current state of the arena to the device"
     #TODO needs to be tested
     global MODE, strip, arena, changed_panels

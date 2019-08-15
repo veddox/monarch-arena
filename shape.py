@@ -12,7 +12,7 @@
 import math, time, random ##XXX the latter two are not yet needed
 import arena
 
-def shape(coords, colour="green", flush=False):
+def plot(coords, colour="green", flush=False):
     '''
     Draw a shape from a list of coordinates (as produced by the shape functions).
     colour: The colour to use
@@ -62,9 +62,8 @@ def line(x1, y1, x2, y2):
         x = x+1
     return shape
 
-def polygon(corners):
+def polygon(corners, filled=True):
     "A polygon connecting each set of coordinates passed to it via straight lines"
-    #TODO add `filled` option (see Lisp library)
     shape = line(corners[len(corners)-1][0],
                  corners[len(corners)-1][1],
                  corners[0][0],
@@ -74,36 +73,22 @@ def polygon(corners):
                           corners[c][1],
                           corners[c+1][0],
                           corners[c+1][1]))
-    return shape
+    if filled: return fill_shape(shape)
+    else: return shape
 
-def triangle(x1, y1, x2, y2, x3, y3):
+def triangle(x1, y1, x2, y2, x3, y3, filled=True):
     corners = ((x1,y1), (x2,y2), (x3,y3))
-    return polygon(corners)
+    return polygon(corners, filled)
 
-def rectangle(x1, y1, x2, y2, x3, y3, x4, y4, filled=False):
+def rectangle(x1, y1, x2, y2, x3, y3, x4, y4, filled=True):
     '''
     Draw a shape with four sides (doesn't strictly have to be a rectangle).
     filled: if false, simply returns the outline
     '''
     corners = ((x1,y1), (x2,y2), (x3,y3), (x4,y4))
-    outline = polygon(corners)
-    if not filled: return outline
-    shape = outline
-    for x in range(min(x1,x2,x3,x4), max(x1,x2,x3,x4)+1):
-        for y in range(min(y1,y2,y3,y4), max(y1,y2,y3,y4)+1):
-            conds = []
-            for c in outline:
-                # Every point inside the rectangle has, on the same
-                # axis, one point larger and one smaller than itself
-                if x == c[0] and y < c[1]: conds.append("yl")
-                elif x == c[0] and y > c[1]: conds.append("yg")
-                if y == c[1] and x < c[0]: conds.append("xl")
-                elif y == c[1] and x > c[0]: conds.append("xg")
-            if "yl" in conds and "yg" in conds and "xl" in conds and "xg" in conds:
-                shape.append((x,y))
-    return shape
+    return polygon(corners, filled)
 
-def circle(center_x, center_y, radius, filled=False, quarters=[1,2,3,4]):
+def circle(center_x, center_y, radius, filled=True, quarters=[1,2,3,4]):
     '''
     Draw a circle, defined by its center point and radius.
     filled: if false, will only draw the outline
@@ -120,5 +105,25 @@ def circle(center_x, center_y, radius, filled=False, quarters=[1,2,3,4]):
                 if 4 in quarters: shape.append((center_x-y, center_y-x))
     return shape
 
-## ANIMATION FUNCTIONS
-# TODO
+def fill_shape(shape):
+    "Take a shape that only shows the borders and 'colour it out'"
+    # Iterate over the shape's enclosing rectangle, adding any points
+    # inside the shape to its coordinate list
+    filling = []
+    xvals = map(lambda c: c[0], shape)
+    yvals = map(lambda c: c[1], shape)
+    min_x, min_y = min(xvals), min(yvals)
+    max_x, max_y = max(xvals), max(yvals)
+    for x in range(min_x, max_x+1):
+        for y in range(min_y, max_y+1):
+            # Every point inside the rectangle has, on the same
+            # axis, one point larger and one smaller than itself
+            yl = filter(lambda c: c[0] == x and c[1] > y, shape)
+            yg = filter(lambda c: c[0] == x and c[1] < y, shape)
+            xl = filter(lambda c: c[1] == y and c[0] > x, shape)
+            xg = filter(lambda c: c[1] == y and c[0] < x, shape)
+            if not 0 in map(len, (yl,yg,xl,xg)):
+                filling.append((x,y))
+    shape.extend(filling)
+    return shape
+
