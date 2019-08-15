@@ -2,10 +2,9 @@
 
 ## Core
 
-- check if pin setup is correct (and get clock pin numbers)
+- rewrite PARALLEL mode to account for the single strip
 
-- test PARALLEL and DUPLICATE modes
-
+- fix line drawing function
 
 ## Extended
 

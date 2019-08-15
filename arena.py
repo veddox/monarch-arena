@@ -32,21 +32,16 @@ MODE = "SERIAL" #DO NOT CHANGE THIS DIRECTLY! (use `set_mode()`)
 global toggle
 toggle = 25
 
-# The GPIO data & clock pin numbers used by the eight panels
-
-# FIXME Problem: the arena only has a single data/clock channel duo. Ergo, we
-# can only have a single Dotstar strip. So I basically need to rewrite the
-# entire architecture here...
-
-global panels
-panels = (5, 6, 13, 19, 26, 16, 20, 21)
+# The GPIO pin numbers used to activate the eight panels
+global pins
+pins = (5, 6, 13, 19, 26, 16, 20, 21)
 
 def init_GPIO():
     "(Re)initialise the Raspberry Pi GPIO pins"
-    global MODE, toggle, panels
+    global MODE, toggle, pins
     if MODE == "TEXT": return
     GPIO.setmode(GPIO.BCM)   #XXX Wouldn't BOARD be better? (higher-level)
-    for p in panels:
+    for p in pins:
         #make sure we're starting with a blank slate
         if GPIO.gpio_func(p) != GPIO.IN:
             GPIO.cleanup()   #XXX Call this again at the end?
@@ -54,7 +49,7 @@ def init_GPIO():
     #GPIO.setwarnings(False) #XXX I don't like disabling warnings by default...
     GPIO.setup(toggle, GPIO.OUT) #used to select parallel or serial mode
     GPIO.output(toggle, GPIO.LOW)
-    for p in panels:
+    for p in pins:
         GPIO.setup(p, GPIO.OUT)
         GPIO.output(p, GPIO.LOW)
     # Toggle the hardware mode if necessary
@@ -62,7 +57,7 @@ def init_GPIO():
         GPIO.output(toggle, GPIO.HIGH)
     # Turn on the panel pins if necessary
     if MODE == "SERIAL" or MODE == "DUPLICATE":
-        for p in panels:
+        for p in pins:
             GPIO.output(p, GPIO.HIGH)
 
 init_GPIO() #should be initialised when module first loads
@@ -88,30 +83,34 @@ def init_dimensions():
     width = pwidth * npanels
 
 init_dimensions()
-    
-## Create an Adafruit strip object to interface with the panels
-global strip
-strip = Adafruit_DotStar(height*pwidth, 2000000) # 2MHz
-strip.begin()
+
+## Adafruit strip object and internal representations of the strip buffer
+global strip, arena, changed_panels
+
+def init_arena():
+    "Create the strip and buffer objects"
+    global strip, arena, changed_panels
+    global height, pwidth, width, npanels
+    strip = Adafruit_DotStar(height*pwidth, 2000000) # 2MHz
+    strip.begin()
+    #XXX For maximum speed, use a byte array of RGB values instead
+    # (see `image-pov.py` in the Adafruit library for example code)
+    arena = ["black"] * height * width
+    changed_panels = [False] * npanels
+
+init_arena()
 
 global colours
-colours = {"black":(strips[0].Color(0, 0, 0), "-"),
-           "red":(strips[0].Color(0, 15, 0), "R"),
-           "green":(strips[0].Color(1, 0, 0), "G"),
-           "blue":(strips[0].Color(0, 0, 1), "B"),
-           "orange":(strips[0].Color(2,5,0), "O"),
-           "magenta":(strips[0].Color(0, 5, 7), "M"),
-           "yellow":(strips[0].Color(10, 10, 0), "Y"),
-           "cyan":(strips[0].Color(10, 0, 10), "C")}
+colours = {"black":(strip.Color(0, 0, 0), "-"),
+           "red":(strip.Color(0, 15, 0), "R"),
+           "green":(strip.Color(1, 0, 0), "G"),
+           "blue":(strip.Color(0, 0, 1), "B"),
+           "orange":(strip.Color(2,5,0), "O"),
+           "magenta":(strip.Color(0, 5, 7), "M"),
+           "yellow":(strip.Color(10, 10, 0), "Y"),
+           "cyan":(strip.Color(10, 0, 10), "C")}
 
-
-## ARENA DEFINITIONS
-
-global arena
-#XXX change arena to an array of ints to save space?
-#XXX Or better yet, use a byte array for maximum speed transfers
-# (see `image-pov.py` in the Adafruit library for example code)
-arena = ["black"] * height * width
+## ARENA FUNCTIONS
 
 def clear_arena(colour="black", show=True):
     "Reset the arena to a given colour (default: black/off)"
@@ -140,25 +139,17 @@ def pixel_id(x, y, toroidal=True):
 def pixel(x,y):
     "Get the colour of this pixel."
     global arena
-    return arena[pixel_id(x,y)]
-    
+    return arena[pixel_id(x,y)]    
 
-## DRAWING FUNCTIONS
+## PLOTTING FUNCTIONS
 
 def set_pixel(x,y,colour):
     "Set the colour of a single pixel."
-    global arena
-    arena[pixel_id(x,y)] = colour
-
-def draw_arena():
-    "Output the current state of the arena"
-    global MODE
-    if MODE == "TEXT":
-        print_arena()
-    elif MODE == "PARALLEL":
-        draw_arena_parallel()
-    elif MODE == "SERIAL" or MODE == "DUPLICATE":
-        draw_arena_serial()
+    global arena, changed_panels, pwidth, height
+    pid = pixel_id(x,y)
+    arena[pid] = colour
+    #prior to v3, Python doesn't convert to float when dividing ints
+    changed_panels[pid/(pwidth*height)] = True
     
 def print_arena():
     "Print out a text representation of the current state of the arena."
@@ -169,31 +160,27 @@ def print_arena():
         sys.stdout.write('\n')
         sys.stdout.flush()
 
-def draw_arena_serial():
-    "Draw the current state of the arena to the device in serial mode"
-    # Also works for duplicate mode (only difference: width is smaller in
-    # duplicate mode and all panel pins are on - see `init_*` functions).
-    global height, width, colour, strip, arena
-    for y in range(height):
-        for x in range(width):
-            strip.setPixelColor(pixel_id(x,y), colours[pixel(x,y)][0])
-    strip.show()
-
-def draw_arena_parallel():
-    "Draw the arena, taking advantage of the parallel mode"
+def draw_arena():
+    "Output the current state of the arena to the device"
     #TODO needs to be tested
-    #FIXME this function is currently completely broken!
-    # (due to us now only having one strip object available)
-    global height, width, pwidth, npanels, colour, strip, arena
-    changed_panels = [False] * npanels
-    for x in range(width):
+    global MODE, strip, arena, changed_panels
+    global height, width, colour, npanels
+    # text mode is handled by a different function
+    if MODE == "TEXT":
+        print_arena()
+        return
+    # update each panel that has been changed
+    for p in range(npanels):
+        if not changed_panels[p]: continue
+        # make sure to activate a panel when in parallel mode
+        if MODE == "PARALLEL": GPIO.output(p, GPIO.HIGH)
         for y in range(height):
-                strips[panel].setPixelColor(pixel_id(x%pwidth,y),
-                                            colours[pixel(x,y)][0])
-                changed_panels[panel] = True
-    # only update panels that have actually changed
-    for p in range(len(changed_panels)):
-        if changed_panels[p]: strips[p].show()
+            for x in range(pwidth):
+                pid = pixel_id(x+(p*pwidth), y)
+                strip.setPixelColor(pid, colours[pid][0])
+        strip.show()
+        if MODE == "PARALLEL": GPIO.output(p, GPIO.LOW)
+        changed_panels[p] = False
 
 ## UTILITY FUNCTIONS
                 
@@ -207,6 +194,7 @@ def set_mode(new_mode):
         MODE = new_mode
         init_GPIO()
         init_dimensions()
+        init_arena()
 
 def parseArgs():
     '''
