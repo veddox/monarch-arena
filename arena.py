@@ -41,12 +41,9 @@ def init_GPIO():
     global MODE, toggle, pins
     if MODE == "TEXT": return
     GPIO.setmode(GPIO.BCM)   #XXX Wouldn't BOARD be better? (higher-level)
-    for p in pins:
-        #make sure we're starting with a blank slate
-        if GPIO.gpio_func(p) != GPIO.IN:
-            GPIO.cleanup()   #XXX Call this again at the end?
-            break
     #GPIO.setwarnings(False) #XXX I don't like disabling warnings by default...
+    for p in list(pins)+[toggle]: #Set all to the default
+        GPIO.setup(p, GPIO.IN)    #XXX Not sure if this makes sense?
     GPIO.setup(toggle, GPIO.OUT) #used to select parallel or serial mode
     GPIO.output(toggle, GPIO.LOW)
     for p in pins:
@@ -116,7 +113,7 @@ def clear(colour="black", show=True):
     "Reset the arena to a given colour (default: black/off)"
     global arena, height, width
     arena = [colour] * height * width
-    if show: draw_arena()
+    if show: render()
 
 def wrap_coords(x, y):
     "If a coordinate is out of bounds, wrap around."
@@ -163,8 +160,8 @@ def print_arena():
 def render():
     "Output the current state of the arena to the device"
     #TODO needs to be tested
-    global MODE, strip, arena, changed_panels
-    global height, width, colour, npanels
+    global MODE, strip, arena, pins, changed_panels
+    global height, width, pwidth, colour, npanels
     # text mode is handled by a different function
     if MODE == "TEXT":
         print_arena()
@@ -173,13 +170,15 @@ def render():
     for p in range(npanels):
         if not changed_panels[p]: continue
         # make sure to activate a panel when in parallel mode
-        if MODE == "PARALLEL": GPIO.output(p, GPIO.HIGH)
+        if MODE == "PARALLEL": GPIO.output(pins[p], GPIO.HIGH)
         for y in range(height):
             for x in range(pwidth):
                 pid = pixel_id(x+(p*pwidth), y)
-                strip.setPixelColor(pid, colours[pid][0])
+                col = colours[arena[pid]][0]
+                spid = pid - (p*pwidth*height)
+                strip.setPixelColor(spid, col)
         strip.show()
-        if MODE == "PARALLEL": GPIO.output(p, GPIO.LOW)
+        if MODE == "PARALLEL": GPIO.output(pins[p], GPIO.LOW)
         changed_panels[p] = False
 
 ## UTILITY FUNCTIONS
@@ -209,8 +208,8 @@ def parseArgs():
         print "\t./arena.py set <x> <y> <colour>"
     elif "clear" in sys.argv:
         if sys.argv[-1] in colours.keys():
-            clear_arena(sys.argv[-1])
-        else: clear_arena()
+            clear(sys.argv[-1])
+        else: clear()
     elif "set" in sys.argv:
         x = sys.argv[-3]
         y = sys.argv[-2]
@@ -220,7 +219,7 @@ def parseArgs():
         else:
             print "Usage: ./arena.py set <x> <y> <colour>"
             return
-    draw_arena()
+    render()
 
 if __name__ == '__main__':
     parseArgs()
