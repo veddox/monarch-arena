@@ -25,6 +25,7 @@ There are a couple of scripts to display pre-defined images/animations:
 
 * `house.py` is an example script that draws an image of a house
 * `landscape.py` animates two elements moving around a simple landscape
+* `dot_bar.py` is a simplified version of the landscape
 * *work in progress...*
 
 ## Usage
