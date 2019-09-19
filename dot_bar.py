@@ -6,10 +6,12 @@
 ### Licensed under the terms of the GNU GPLv3
 
 import arena, shape
-import time
+import sys, time
 
 
 ### SETTINGS ###
+
+## (Settings may be changed via the commandline, see below.)
 
 # [dot,bar]_mode:
 # 0 -> shape is excluded
@@ -19,9 +21,8 @@ global dot_mode, bar_mode
 dot_mode = 2
 bar_mode = 1
 
-#TODO change to "PARALLEL"
 global animation_mode
-animation_mode = "TEXT"
+animation_mode = "PARALLEL"
 
 # Background, bar, and dot colours
 global bg_col, bar_col, dot_col
@@ -80,6 +81,31 @@ def animate(ticks=-1):
         draw_dot(i)
         arena.render()
         time.sleep(1.0/fps)   
+
+def parse_args():
+    '''
+    Set parameters from the commandline by argument index.
+    1st param: dot_mode
+    2nd param: bar_mode
+    3rd param: animation_mode
+    4th param: fps
+    '''
+    global dot_mode, bar_mode, animation_mode, bg_col, bar_col, fps
+    if len(sys.argv) == 2 or len(sys.argv) > 5:
+        raise Exception("Bad number of args. See the source for details.")
+    if len(sys.argv) >= 3:
+        dot_mode = int(sys.argv[1])
+        bar_mode = int(sys.argv[2])
+    if len(sys.argv) >= 4:
+        animation_mode = sys.argv[3]
+        if animation_mode == "TEXT":
+            bg_col, bar_col = "black", "blue"
+        else:
+            bg_col, bar_col = "blue", "black"
+    if len(sys.argv) == 5:
+        fps = int(sys.argv[4])
+    
         
 if __name__ == '__main__':
+    parse_args()
     arena.run(animate, animation_mode)
