@@ -196,6 +196,22 @@ def set_mode(new_mode):
         init_dimensions()
         init_arena()
 
+def run(display_fn, mode=None):
+    '''
+    Execute the function display_fn safely. Strongly recommended for scripts!
+    display_fn: A function object to execute (no arguments accepted).
+    mode: The mode to switch to before execution.
+    '''
+    if mode is not None: set_mode(mode)
+    try:
+        display_fn()
+    except KeyboardInterrupt:
+        print "Terminating."
+    except Exception as e:
+        print "Error:", e
+    finally:
+        GPIO.cleanup()
+        
 def parseArgs():
     '''
     A rudimentary commandline interface. Usage:
