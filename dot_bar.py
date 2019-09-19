@@ -33,6 +33,10 @@ else:
     bg_col = "blue"
     bar_col = "black"
 
+# Animation speed in frames per second
+global fps
+fps = 21
+    
 
 ### FUNCTIONS ###
 
@@ -60,20 +64,20 @@ def draw_dot(t, x0_dot=0, y_dot=6):
     else:
         raise Exception("Invalid dot mode: "+str(dot_mode))
 
-def animate(ticks=-1, fps=21):
+def animate(ticks=-1):
     '''
     Animate the elements at the given framerate for a set time
     
     ticks: number of ticks to run the animation for (-1 -> forever)
     fps: framerate in ticks per second (default: 21fps = 60deg/s)
     '''
-    global bg_col
-    arena.clear(background, show=False)
+    global bg_col, fps
+    arena.clear(bg_col, show=False)
     i = 0
     while i != ticks:
         i = i + 1 # infinity loop if ticks = -1
-        draw_bar(t)
-        draw_dot(t)
+        draw_bar(i)
+        draw_dot(i)
         arena.render()
         time.sleep(1.0/fps)   
         

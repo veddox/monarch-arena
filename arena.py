@@ -240,6 +240,7 @@ def parseArgs():
             print "Usage: ./arena.py set <x> <y> <colour>"
             return
     render()
+    GPIO.cleanup()
 
 if __name__ == '__main__':
     parseArgs()
