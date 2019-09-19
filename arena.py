@@ -111,8 +111,9 @@ colours = {"black":(strip.Color(0, 0, 0), "-"),
 
 def clear(colour="black", show=True):
     "Reset the arena to a given colour (default: black/off)"
-    global arena, height, width
-    arena = [colour] * height * width
+    global arena, npanels, changed_panels
+    for a in range(len(arena)): arena[a] = colour
+    changed_panels = [True] * npanels
     if show: render()
 
 def wrap_coords(x, y):

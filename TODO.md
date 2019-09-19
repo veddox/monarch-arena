@@ -2,9 +2,9 @@
 
 ## Core
 
-- test on hardware
+- write `safe_run()` function with `GPIO.cleanup()`
 
-- switch internal buffer to bytearray for maximum performance
+- switch internal buffer to bytearray for maximum performance?
 
 ## Extended
 
