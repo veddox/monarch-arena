@@ -21,13 +21,13 @@ global dot_mode, bar_mode
 dot_mode = 2
 bar_mode = 1
 
-global animation_mode
-animation_mode = "PARALLEL"
+global display_mode
+display_mode = "PARALLEL"
 
 # Background, bar, and dot colours
 global bg_col, bar_col, dot_col
 dot_col = "green"
-if animation_mode == "TEXT":
+if display_mode == "TEXT":
     bg_col = "black"
     bar_col = "blue"
 else:
@@ -87,18 +87,18 @@ def parse_args():
     Set parameters from the commandline by argument index.
     1st param: dot_mode
     2nd param: bar_mode
-    3rd param: animation_mode
+    3rd param: display_mode
     4th param: fps
     '''
-    global dot_mode, bar_mode, animation_mode, bg_col, bar_col, fps
+    global dot_mode, bar_mode, display_mode, bg_col, bar_col, fps
     if len(sys.argv) == 2 or len(sys.argv) > 5:
         raise Exception("Bad number of args. See the source for details.")
     if len(sys.argv) >= 3:
         dot_mode = int(sys.argv[1])
         bar_mode = int(sys.argv[2])
     if len(sys.argv) >= 4:
-        animation_mode = sys.argv[3]
-        if animation_mode == "TEXT":
+        display_mode = sys.argv[3]
+        if display_mode == "TEXT":
             bg_col, bar_col = "black", "blue"
         else:
             bg_col, bar_col = "blue", "black"
@@ -108,4 +108,4 @@ def parse_args():
         
 if __name__ == '__main__':
     parse_args()
-    arena.run(animate, animation_mode)
+    arena.run(animate, display_mode)

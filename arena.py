@@ -22,7 +22,7 @@ from dotstar import Adafruit_DotStar #https://github.com/adafruit/Adafruit_DotSt
 ## "DUPLICATE": All subpanels are sent identical information (limits screen size
 ##              to 16x16 pixels but minimises time delays)
 global MODE
-MODE = "PARALLEL" #DO NOT CHANGE THIS DIRECTLY! (use `set_mode()`)
+MODE = "PARALLEL" #DO NOT CHANGE THIS DIRECTLY! (use `set_mode()` or `run()`)
 
 
 ## RASPBERRY GPIO SETUP
