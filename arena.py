@@ -185,8 +185,11 @@ def render():
 ## UTILITY FUNCTIONS
                 
 def set_mode(new_mode):
-    "Change the output mode to one of 'TEXT', 'SERIAL', 'PARALLEL', 'DUPLICATE'"
-    #NB: Call this instead of setting MODE directly!
+    '''
+    Change the output mode to one of 'TEXT', 'SERIAL', 'PARALLEL', 'DUPLICATE'
+    Call this instead of setting MODE directly!
+    Even better, use `arena.run()` instead.
+    '''
     global MODE
     if new_mode not in ("TEXT", "SERIAL", "PARALLEL", "DUPLICATE"):
         raise Exception("Invalid mode "+new_mode)
