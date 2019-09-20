@@ -28,6 +28,8 @@ There are a couple of scripts to display pre-defined images/animations:
 * `dot_bar.py` is a simplified version of the landscape
 * `optic_flow.py` simulates optic flow using a moving pattern of vertical bars
 
+These can simply be executed from the commandline.
+
 ## Usage
 
 `arena.py` has a rudimentary commandline interface to set either the whole screen
@@ -38,15 +40,16 @@ or individual pixels:
 ./arena.py set <x> <y> <colour>
 ```
 
-To create displays and animations, import the `arena` and `draw` modules. Use 
+To create displays and animations, import the `arena` and `shape` modules. Use 
 `arena.set_mode()` to choose a mode. Write a function that does what you want, 
 then pass this function to `arena.run()` for safe execution. For more details,
 read the API documentation or see the examples in `house.py` and `landscape.py`.
 
-**NOTE:** This is the `production` branch. To run this software anywhere that is
-not a Raspberry Pi, you will need to check out the `master` branch. (This
-contains mockups of the required, Pi-specific libraries, that are needed during
-development.)
+**IMPORTANT:** If you are running this on a Raspberry Pi, delete the `RPi` 
+directory and the `dotstar.py` module. These are mockups used during 
+development - you will need the real versions installed. (The mockups are already
+deleted on the `production` branch, so you can just check that out.) *Weird
+things will happen if you forget this!*
 
 ---
 
