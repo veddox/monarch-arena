@@ -2,14 +2,14 @@
 
 ## Core
 
-- test on hardware
-
-- switch internal buffer to bytearray for maximum performance
+- switch internal buffer to bytearray for maximum performance?
 
 ## Extended
 
-- write animation functions?
+- check if dot/bar pattern is correct
 
-- check if landscape pattern is correct
+- optic flow pattern
+  -> rotation
+  -> flow
 
-- Optical flow pattern
+- detailed landscape pattern

@@ -46,5 +46,4 @@ def animate(ticks=-1, fps=21):
         time.sleep(1.0/fps)   
         
 if __name__ == '__main__':
-    arena.set_mode("PARALLEL")
-    animate()
+    arena.run(animate, "PARALLEL")

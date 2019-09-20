@@ -22,7 +22,7 @@ from dotstar import Adafruit_DotStar #https://github.com/adafruit/Adafruit_DotSt
 ## "DUPLICATE": All subpanels are sent identical information (limits screen size
 ##              to 16x16 pixels but minimises time delays)
 global MODE
-MODE = "PARALLEL" #DO NOT CHANGE THIS DIRECTLY! (use `set_mode()`)
+MODE = "PARALLEL" #DO NOT CHANGE THIS DIRECTLY! (use `set_mode()` or `run()`)
 
 
 ## RASPBERRY GPIO SETUP
@@ -41,11 +41,6 @@ def init_GPIO():
     global MODE, toggle, pins
     if MODE == "TEXT": return
     GPIO.setmode(GPIO.BCM)   #XXX Wouldn't BOARD be better? (higher-level)
-    for p in pins:
-        #make sure we're starting with a blank slate
-        if GPIO.gpio_func(p) != GPIO.IN:
-            GPIO.cleanup()   #XXX Call this again at the end?
-            break
     #GPIO.setwarnings(False) #XXX I don't like disabling warnings by default...
     GPIO.setup(toggle, GPIO.OUT) #used to select parallel or serial mode
     GPIO.output(toggle, GPIO.LOW)
@@ -114,9 +109,10 @@ colours = {"black":(strip.Color(0, 0, 0), "-"),
 
 def clear(colour="black", show=True):
     "Reset the arena to a given colour (default: black/off)"
-    global arena, height, width
-    arena = [colour] * height * width
-    if show: draw_arena()
+    global arena, npanels, changed_panels
+    for a in range(len(arena)): arena[a] = colour
+    changed_panels = [True] * npanels
+    if show: render()
 
 def wrap_coords(x, y):
     "If a coordinate is out of bounds, wrap around."
@@ -163,8 +159,8 @@ def print_arena():
 def render():
     "Output the current state of the arena to the device"
     #TODO needs to be tested
-    global MODE, strip, arena, changed_panels
-    global height, width, colour, npanels
+    global MODE, strip, arena, pins, changed_panels
+    global height, width, pwidth, colour, npanels
     # text mode is handled by a different function
     if MODE == "TEXT":
         print_arena()
@@ -173,20 +169,25 @@ def render():
     for p in range(npanels):
         if not changed_panels[p]: continue
         # make sure to activate a panel when in parallel mode
-        if MODE == "PARALLEL": GPIO.output(p, GPIO.HIGH)
+        if MODE == "PARALLEL": GPIO.output(pins[p], GPIO.HIGH)
         for y in range(height):
             for x in range(pwidth):
                 pid = pixel_id(x+(p*pwidth), y)
-                strip.setPixelColor(pid, colours[pid][0])
+                col = colours[arena[pid]][0]
+                spid = pid - (p*pwidth*height)
+                strip.setPixelColor(spid, col)
         strip.show()
-        if MODE == "PARALLEL": GPIO.output(p, GPIO.LOW)
+        if MODE == "PARALLEL": GPIO.output(pins[p], GPIO.LOW)
         changed_panels[p] = False
 
 ## UTILITY FUNCTIONS
                 
 def set_mode(new_mode):
-    "Change the output mode to one of 'TEXT', 'SERIAL', 'PARALLEL', 'DUPLICATE'"
-    #NB: Call this instead of setting MODE directly!
+    '''
+    Change the output mode to one of 'TEXT', 'SERIAL', 'PARALLEL', 'DUPLICATE'
+    Call this instead of setting MODE directly!
+    Even better, use `arena.run()` instead.
+    '''
     global MODE
     if new_mode not in ("TEXT", "SERIAL", "PARALLEL", "DUPLICATE"):
         raise Exception("Invalid mode "+new_mode)
@@ -196,6 +197,22 @@ def set_mode(new_mode):
         init_dimensions()
         init_arena()
 
+def run(display_fn, mode=None):
+    '''
+    Execute the function display_fn safely. Strongly recommended for scripts!
+    display_fn: A function object to execute (no arguments accepted).
+    mode: The mode to switch to before execution.
+    '''
+    if mode is not None: set_mode(mode)
+    try:
+        display_fn()
+    except KeyboardInterrupt:
+        print "Terminating."
+    except Exception as e:
+        print "Error:", e
+    finally:
+        GPIO.cleanup()
+        
 def parseArgs():
     '''
     A rudimentary commandline interface. Usage:
@@ -209,8 +226,8 @@ def parseArgs():
         print "\t./arena.py set <x> <y> <colour>"
     elif "clear" in sys.argv:
         if sys.argv[-1] in colours.keys():
-            clear_arena(sys.argv[-1])
-        else: clear_arena()
+            clear(sys.argv[-1])
+        else: clear()
     elif "set" in sys.argv:
         x = sys.argv[-3]
         y = sys.argv[-2]
@@ -220,7 +237,8 @@ def parseArgs():
         else:
             print "Usage: ./arena.py set <x> <y> <colour>"
             return
-    draw_arena()
+    render()
+    GPIO.cleanup()
 
 if __name__ == '__main__':
     parseArgs()

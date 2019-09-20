@@ -8,21 +8,22 @@
 import arena
 import shape
 
-arena.clear_arena("blue", show=False) #sky
+def draw_house():
+    arena.clear("blue", show=False) #sky
+    # Note the order of drawing! (Some shapes overlap)
+    shape.plot(shape.rectangle(24,15,72,15,72,7,24,7), colour="orange") #main house
+    shape.plot(shape.rectangle(20,7,24,3,72,3,76,7), colour="red") #roof
+    shape.plot(shape.rectangle(58,15,58,10,64,10,64,15), colour="magenta") #door
+    arena.set_pixel(63,12,"red") #doorknob
+    shape.plot(shape.rectangle(32,9,44,9,44,12,32,12), colour="cyan") #window
+    shape.plot(shape.rectangle(98,11,100,11,100,15,98,15), colour="magenta") #tree trunk
+    shape.plot(shape.circle(99,6,5), colour="green") #tree foliage
+    shape.plot(shape.circle(122,3,2), colour="yellow") #sun
+    shape.plot(shape.line(0,15,127,15), colour="green") #grass
+    arena.render()
 
-# Note the order of drawing! (Some shapes overlap)
-shape.plot(shape.rectangle(24,15,72,15,72,7,24,7), colour="orange") #main house
-shape.plot(shape.rectangle(20,7,24,3,72,3,76,7), colour="red") #roof
-shape.plot(shape.rectangle(58,15,58,10,64,10,64,15), colour="magenta") #door
-arena.set_pixel(63,12,"red") #doorknob
-shape.plot(shape.rectangle(32,9,44,9,44,12,32,12), colour="cyan") #window
-shape.plot(shape.rectangle(98,11,100,11,100,15,98,15), colour="magenta") #tree trunk
-shape.plot(shape.circle(99,6,5), colour="green") #tree foliage
-shape.plot(shape.circle(122,3,2), colour="yellow") #sun
-shape.plot(shape.line(0,15,127,15), colour="green") #grass
+arena.run(draw_house, "PARALLEL")
 
-arena.render()
-
-# Note: the drawn image is not deleted in this script.
-# To clear the arena screen again, call the following from the commandline:
+# To run this, execute './house.py' in a shell. Note: the drawn image
+# is not deleted in this script. To clear the arena screen again, call
 # './arena.py clear'

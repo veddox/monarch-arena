@@ -25,6 +25,7 @@ There are a couple of scripts to display pre-defined images/animations:
 
 * `house.py` is an example script that draws an image of a house
 * `landscape.py` animates two elements moving around a simple landscape
+* `dot_bar.py` is a simplified version of the landscape
 * *work in progress...*
 
 ## Usage
@@ -37,8 +38,10 @@ or individual pixels:
 ./arena.py set <x> <y> <colour>
 ```
 
-Use `arena.set_mode()` to choose a mode. To create displays and animations, import
-the `arena` and `draw` modules (see the example in `house.py`).
+To create displays and animations, import the `arena` and `draw` modules. Use 
+`arena.set_mode()` to choose a mode. Write a function that does what you want, 
+then pass this function to `arena.run()` for safe execution. (See the examples 
+in `house.py` and `landscape.py`.)
 
 **NOTE:** This is the `production` branch. To run this software anywhere that is
 not a Raspberry Pi, you will need to check out the `master` branch. (This
