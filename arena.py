@@ -40,9 +40,8 @@ def init_GPIO():
     "(Re)initialise the Raspberry Pi GPIO pins"
     global MODE, toggle, pins
     if MODE == "TEXT": return
-    GPIO.setmode(GPIO.BCM)   #XXX Wouldn't BOARD be better? (higher-level)
-    #GPIO.setwarnings(False) #XXX I don't like disabling warnings by default...
-    GPIO.setup(toggle, GPIO.OUT) #used to select parallel or serial mode
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(toggle, GPIO.OUT)
     GPIO.output(toggle, GPIO.LOW)
     for p in pins:
         GPIO.setup(p, GPIO.OUT)
@@ -197,6 +196,23 @@ def set_mode(new_mode):
         init_dimensions()
         init_arena()
 
+def toggle_panel(panel, value=None):
+    '''
+    Turn a panel (0-7) on or off. (value == True -> on, value == False -> off,
+    value == None -> toggle). Can only be used in DUPLICATE mode!
+    '''
+    global MODE, pins
+    if MODE != "DUPLICATE":
+        raise Exception("Can only toggle panels in DUPLICATE mode.")
+    if value == None:
+        value = not bool(GPIO.input(panel))
+    elif value == True:
+        value = GPIO.HIGH
+    elif value == False:
+        value = GPIO.LOW
+    else: raise Exception("Invalid toggle value "+str(value))
+    GPIO.output(pins[panel], value)
+        
 def run(display_fn, mode=None):
     '''
     Execute the function display_fn safely. Strongly recommended for scripts!

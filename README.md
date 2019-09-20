@@ -18,7 +18,7 @@ hardware via the [Adafruit DotStar](https://github.com/adafruit/Adafruit_DotStar
 library and offers a choice between various display modes (`SERIAL`, `PARALLEL`,
 `DUPLICATE`, `TEXT`).
 
-The `draw.py` module provides a range of shape drawing functions that can be
+The `shape.py` module provides a range of shape drawing functions that can be
 used to construct experiment display setups.
 
 There are a couple of scripts to display pre-defined images/animations:
@@ -26,7 +26,7 @@ There are a couple of scripts to display pre-defined images/animations:
 * `house.py` is an example script that draws an image of a house
 * `landscape.py` animates two elements moving around a simple landscape
 * `dot_bar.py` is a simplified version of the landscape
-* *work in progress...*
+* `optic_flow.py` simulates optic flow using a moving pattern of vertical bars
 
 ## Usage
 
@@ -43,11 +43,11 @@ To create displays and animations, import the `arena` and `draw` modules. Use
 then pass this function to `arena.run()` for safe execution. For more details,
 read the API documentation or see the examples in `house.py` and `landscape.py`.
 
-**NOTE:** If you're running this on a Raspberry Pi, delete the `RPi` directory
-and the `dotstar.py` module. These are mockups used during development - you 
-will need the real versions installed! (The mockups are already deleted on the 
-`production` branch, so you can just check that out.) *Be warned, weird things
-happen if you forget this...*
+**IMPORTANT:** If you're running this on a Raspberry Pi, delete the `RPi` 
+directory and the `dotstar.py` module. These are mockups used during 
+development - you will need the real versions installed! (The mockups are already
+deleted on the `production` branch, so you can just check that out.) *Be warned,
+weird things happen if you forget this...*
 
 ---
 
