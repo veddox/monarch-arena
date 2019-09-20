@@ -6,9 +6,13 @@
 ### University of Wuerzburg, Center for Computational and Theoretical Biology
 ### Licensed under the terms of the GNU GPLv3
 
+### Usage: './optic_flow.py <mode> <fps>', where
+### <mode> is one of ROTATE_RIGHT, ROTATE_LEFT, FLOW_FORWARD, FLOW_BACKWARD
+### <fps> is the delay in sec^-1 between screen updates
+
+
 import arena, shape
 import sys, time
-
 
 ### SETTINGS ###
 
@@ -20,7 +24,7 @@ options = ("ROTATE_RIGHT", "ROTATE_LEFT", "FLOW_FORWARD", "FLOW_BACKWARD")
 mode = "ROTATE_RIGHT"
 
 # Animation speed in frames per second
-#XXX doesn't seem to have an effect?
+#XXX doesn't seem to have an effect? -> limited by hardware
 global fps
 fps = 21
 

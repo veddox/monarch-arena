@@ -5,9 +5,14 @@
 ### University of Wuerzburg, Center for Computational and Theoretical Biology
 ### Licensed under the terms of the GNU GPLv3
 
+### Usage: './dot_bar.py <dot_mode> <bar_mode> <display_mode> <fps>', where
+### <dot_mode> and <bar_mode> are 0 (not shown), 1 (stationary), or 2 (moving)
+### <display_mode> is TEXT or PARALLEL
+### <fps> is the delay in sec^-1 between screen updates
+
+
 import arena, shape
 import sys, time
-
 
 ### SETTINGS ###
 

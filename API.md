@@ -23,7 +23,7 @@ the library works, read the source.*
   
 - `toggle_panel(panel, value=None)` Turn a single panel (0-7) on or off. 
   (value == True -> on, value == False -> off, value == None -> toggle). 
-  *Can only be used in DUPLICATE mode!*
+  *Can only be used in DUPLICATE mode.*
 
 - `clear(colour="black", show=True)` Clear the screen (i.e. set it all to one
   colour). If `show` is true, render immediately.

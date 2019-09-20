@@ -78,14 +78,18 @@ def init_dimensions():
 
 init_dimensions()
 
+## SPI clockrate determines data throughput rate from the Pi to the panels
+global spi_clock
+spi_clock = 10000000 # 10 MHz
+
 ## Adafruit strip object and internal representations of the strip buffer
 global strip, arena, changed_panels
 
 def init_arena():
     "Create the strip and buffer objects"
     global strip, arena, changed_panels
-    global height, pwidth, width, npanels
-    strip = Adafruit_DotStar(height*pwidth, 2000000) # 2MHz
+    global spi_clock, height, pwidth, width, npanels
+    strip = Adafruit_DotStar(height*pwidth, spi_clock)
     strip.begin()
     #TODO For maximum speed, use a byte array of RGB values instead
     # (see `image-pov.py` in the Adafruit library for example code)
