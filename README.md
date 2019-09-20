@@ -28,6 +28,8 @@ There are a couple of scripts to display pre-defined images/animations:
 * `dot_bar.py` is a simplified version of the landscape
 * `optic_flow.py` simulates optic flow using a moving pattern of vertical bars
 
+These can simply be executed from the commandline.
+
 ## Usage
 
 `arena.py` has a rudimentary commandline interface to set either the whole screen
@@ -38,7 +40,7 @@ or individual pixels:
 ./arena.py set <x> <y> <colour>
 ```
 
-To create displays and animations, import the `arena` and `draw` modules. Use 
+To create displays and animations, import the `arena` and `shape` modules. Use 
 `arena.set_mode()` to choose a mode. Write a function that does what you want, 
 then pass this function to `arena.run()` for safe execution. For more details,
 read the API documentation or see the examples in `house.py` and `landscape.py`.
