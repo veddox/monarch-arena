@@ -20,9 +20,10 @@ options = ("ROTATE_RIGHT", "ROTATE_LEFT", "FLOW_FORWARD", "FLOW_BACKWARD")
 mode = "ROTATE_RIGHT"
 
 global display_mode
-display_mode = "TEXT" #TODO change to "PARALLEL"
+display_mode = "PARALLEL"
 
 # Animation speed in frames per second
+#XXX doesn't seem to have an effect?
 global fps
 fps = 21
 
@@ -50,7 +51,7 @@ def rotate(cw=True):
                                    x+12,arena.height), bg_col)
         arena.render()
         time.sleep(1.0/fps)
-        if t < 4: t = t+1
+        if t < 7: t = t+1
         else: t = 0
 
 def flow(fw=True):
