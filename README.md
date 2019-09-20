@@ -40,8 +40,8 @@ or individual pixels:
 
 To create displays and animations, import the `arena` and `draw` modules. Use 
 `arena.set_mode()` to choose a mode. Write a function that does what you want, 
-then pass this function to `arena.run()` for safe execution. (See the examples 
-in `house.py` and `landscape.py`.)
+then pass this function to `arena.run()` for safe execution. For more details,
+read the API documentation or see the examples in `house.py` and `landscape.py`.
 
 **NOTE:** If you're running this on a Raspberry Pi, delete the `RPi` directory
 and the `dotstar.py` module. These are mockups used during development - you 

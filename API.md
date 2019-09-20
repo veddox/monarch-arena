@@ -9,20 +9,20 @@ the library works, read the source.*
 - `MODE` A string value indicating the output mode for the arena. Possible
   values: "SERIAL" (legacy mode), "PARALLEL" (default), "DUPLICATE" (all arena
   panels show the same image), "TEXT" (output as ASCII to computer screen).
-  **IMPORTANT::** Do *not* change this directly. Use `set_mode()` or `run()`
+  **IMPORTANT:** Do *not* change this directly. Use `set_mode()` or `run()`
   instead.
   
 - `colours` A dict mapping colour names to their RGB values (for arena output) 
   or a letter (for ASCII output).
   
 - `arena` An internal representation of the screen, implemented as a list of
-  colour strings. *Do not use directly.*
+  colour strings. **Do not modify.**
 
 - `set_mode(new_mode)` Change the output mode and do all associated
   housekeeping.
 
 - `clear(colour="black", show=True)` Clear the screen (i.e. set it all to one
-  colour. If `show` is true, render immediately.
+  colour). If `show` is true, render immediately.
   
 - `pixel(x,y)` Get the current colour of this pixel.
 
@@ -33,8 +33,8 @@ the library works, read the source.*
 
 - `run(display_fn, mode=None)` Safely execute a function object, making sure to
   clean up afterwards and catching any errors or keyboard interrupts (by Ctrl-C).
-  Can optionally be used to set the output mode. **This should be the final 
-  function called by a script.**
+  Can optionally be used to set the output mode. **This is the main entry point
+  and should be the final function called by a script.**
   
 ## shape.py
 
@@ -50,12 +50,12 @@ to `plot()`.*
 - `polygon(corners, filled=True)` Construct a shape by linking the corners,
   optionally filling it out. `corners`: a list of pairs of coordinates.
   
-- `triangle(x1, y1, x2, y2, x3, y3, filled=True)` Draw a triangle.
+- `triangle(x1, y1, x2, y2, x3, y3, filled=True)` Returns a triangle.
 
-- `rectangle(x1, y1, x2, y2, x3, y3, x4, y4, filled=True)` Draw a rectangle.
+- `rectangle(x1, y1, x2, y2, x3, y3, x4, y4, filled=True)` Returns a rectangle.
 
 - `circle(center_x, center_y, radius, filled=True, quarters=[1,2,3,4])`
-  Draw a circle using its center point and radius, optionally specifying which
+  Create a circle using its center point and radius, optionally specifying which
   quadrants to draw.
 
 - `fill_shape(shape)` Take a shape (a list of coordinates enclosing a space)
