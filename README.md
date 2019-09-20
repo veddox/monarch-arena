@@ -18,7 +18,7 @@ hardware via the [Adafruit DotStar](https://github.com/adafruit/Adafruit_DotStar
 library and offers a choice between various display modes (`SERIAL`, `PARALLEL`,
 `DUPLICATE`, `TEXT`).
 
-The `draw.py` module provides a range of shape drawing functions that can be
+The `shape.py` module provides a range of shape drawing functions that can be
 used to construct experiment display setups.
 
 There are a couple of scripts to display pre-defined images/animations:
@@ -26,7 +26,7 @@ There are a couple of scripts to display pre-defined images/animations:
 * `house.py` is an example script that draws an image of a house
 * `landscape.py` animates two elements moving around a simple landscape
 * `dot_bar.py` is a simplified version of the landscape
-* *work in progress...*
+* `optic_flow.py` simulates optic flow using a moving pattern of vertical bars
 
 ## Usage
 
@@ -40,8 +40,8 @@ or individual pixels:
 
 To create displays and animations, import the `arena` and `draw` modules. Use 
 `arena.set_mode()` to choose a mode. Write a function that does what you want, 
-then pass this function to `arena.run()` for safe execution. (See the examples 
-in `house.py` and `landscape.py`.)
+then pass this function to `arena.run()` for safe execution. For more details,
+read the API documentation or see the examples in `house.py` and `landscape.py`.
 
 **NOTE:** This is the `production` branch. To run this software anywhere that is
 not a Raspberry Pi, you will need to check out the `master` branch. (This

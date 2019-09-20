@@ -19,10 +19,8 @@ global options, mode
 options = ("ROTATE_RIGHT", "ROTATE_LEFT", "FLOW_FORWARD", "FLOW_BACKWARD")
 mode = "ROTATE_RIGHT"
 
-global display_mode
-display_mode = "TEXT" #TODO change to "PARALLEL"
-
 # Animation speed in frames per second
+#XXX doesn't seem to have an effect?
 global fps
 fps = 21
 
@@ -32,30 +30,51 @@ fg_col, bg_col = "blue", "black"
 
 ### FUNCTIONS ###
 
+def panel_pattern(x_off):
+    global fg_col, bg_col
+    "Draw a bar pattern on a single panel with a given offset."
+    shape.plot(shape.rectangle(x_off,0, x_off+3,0, x_off+3,arena.height,
+                               x_off,arena.height), fg_col)
+    shape.plot(shape.rectangle(x_off+4,0, x_off+7,0, x_off+7,arena.height,
+                               x_off+4,arena.height), bg_col)
+    shape.plot(shape.rectangle(x_off+8,0, x_off+11,0, x_off+11,arena.height,
+                               x_off+8,arena.height), fg_col)
+    shape.plot(shape.rectangle(x_off+12,0, x_off+15,0, x_off+15,arena.height,
+                               x_off+12,arena.height), bg_col)
+
 def rotate(cw=True):
     "Rotate the bar pattern, clockwise (if cw is True) or anticlockwise."
-    global display_mode, fg_col, bg_col, fps
-    if display_mode != "TEXT": arena.set_mode("DUPLICATE") #for efficiency
+    global fps
     t = 0
     while True:
-        if cw: x = t
-        else: x = t*-1
-        shape.plot(shape.rectangle(x,0,x+3,0,x+3,arena.height,
-                                   x,arena.height), fg_col)
-        shape.plot(shape.rectangle(x+4,0,x+7,0,x+7,arena.height,
-                                   x+4,arena.height), bg_col)
-        shape.plot(shape.rectangle(x+8,0,x+11,0,x+11,arena.height,
-                                   x+8,arena.height), fg_col)
-        shape.plot(shape.rectangle(x+12,0,x+15,0,x+15,arena.height,
-                                   x+12,arena.height), bg_col)
+        if cw: x_offset = t
+        else: x_offset = t * (-1)
+        panel_pattern(x_offset)
         arena.render()
         time.sleep(1.0/fps)
-        if t < 4: t = t+1
+        if t < 7: t = t+1
         else: t = 0
 
 def flow(fw=True):
     "Show the optic flow pattern, forward (if fw is True) or backward."
-    pass #TODO
+    global fps
+    t = 0
+    while True:
+        if fw: x_left, x_right = t*(-1), t
+        else: x_left, x_right = t, t*(-1)
+        panel_pattern(x_right)
+        for p in range(8):
+            if p < 4: arena.toggle_panel(p, True)
+            else: arena.toggle_panel(p, False)
+        arena.render()
+        panel_pattern(x_left)
+        for p in range(8):
+            if p < 4: arena.toggle_panel(p, False)
+            else: arena.toggle_panel(p, True)
+        arena.render()
+        time.sleep(1.0/fps)
+        if t < 7: t = t+1
+        else: t = 0
 
 def animate():
     "Run the animation chosen by `mode`."
@@ -74,11 +93,10 @@ def animate():
 def parse_args():
     '''
     Set parameters from the commandline by argument index.
-    1st param: mode (int or string)
-    2nd param: display_mode
-    3rd param: fps
+    1st param: animation mode (int or string)
+    2nd param: fps
     '''
-    global options, mode, display_mode, fps
+    global options, mode, fps
     if len(sys.argv) > 4:
         raise Exception("Bad number of args. See the source for details.")
     if len(sys.argv) >= 2:
@@ -86,11 +104,10 @@ def parse_args():
         if mode.isdigit(): mode = options[int(mode)]
         if mode not in options:
             raise Exception("Invalid mode "+mode+". Must be in "+options)
-    if len(sys.argv) >= 3:
-        display_mode = sys.argv[2]
-    if len(sys.argv) == 4:
-        fps = int(sys.argv[3])
+    if len(sys.argv) == 3:
+        fps = int(sys.argv[2])
 
 if __name__ == '__main__':
     parse_args()
-    arena.run(animate, display_mode)
+    # must run in duplicate mode!
+    arena.run(animate, "DUPLICATE")
