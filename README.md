@@ -38,15 +38,16 @@ or individual pixels:
 ./arena.py set <x> <y> <colour>
 ```
 
-Use `arena.set_mode()` to choose a mode. To create displays and animations, import
-the `arena` and `draw` modules. Write a function that does what you want, then
-pass this function to `arena.run()` for safe execution. (See the examples in 
-`house.py` and `landscape.py`.)
+To create displays and animations, import the `arena` and `draw` modules. Use 
+`arena.set_mode()` to choose a mode. Write a function that does what you want, 
+then pass this function to `arena.run()` for safe execution. (See the examples 
+in `house.py` and `landscape.py`.)
 
 **NOTE:** If you're running this on a Raspberry Pi, delete the `RPi` directory
 and the `dotstar.py` module. These are mockups used during development - you 
 will need the real versions installed! (The mockups are already deleted on the 
-`production` branch, so you can just check that out.)
+`production` branch, so you can just check that out.) *Be warned, weird things
+happen if you forget this...*
 
 ---
 

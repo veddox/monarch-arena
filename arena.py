@@ -42,8 +42,6 @@ def init_GPIO():
     if MODE == "TEXT": return
     GPIO.setmode(GPIO.BCM)   #XXX Wouldn't BOARD be better? (higher-level)
     #GPIO.setwarnings(False) #XXX I don't like disabling warnings by default...
-    for p in list(pins)+[toggle]: #Set all to the default
-        GPIO.setup(p, GPIO.IN)    #XXX Not sure if this makes sense?
     GPIO.setup(toggle, GPIO.OUT) #used to select parallel or serial mode
     GPIO.output(toggle, GPIO.LOW)
     for p in pins:
