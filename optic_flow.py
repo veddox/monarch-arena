@@ -60,8 +60,8 @@ def flow(fw=True):
     global fps
     t = 0
     while True:
-        if fw: x_left, x_right = t*(-1), t
-        else: x_left, x_right = t, t*(-1)
+        if fw: x_left, x_right = t*(-1)+4, t
+        else: x_left, x_right = t+4, t*(-1)
         panel_pattern(x_right)
         for p in range(8):
             if p < 4: arena.toggle_panel(p, True)
