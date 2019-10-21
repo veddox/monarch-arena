@@ -88,8 +88,7 @@ def flow(fw=True):
 
 def animate():
     "Run the animation chosen by `mode`."
-    global mode, duration
-    print("Running "+mode+" for "+str(duration)+" updates.") #log/debug
+    global mode
     if mode == "ROTATE_RIGHT":
         rotate(True)
     elif mode == "ROTATE_LEFT":
@@ -123,5 +122,6 @@ def parse_args():
 
 if __name__ == '__main__':
     parse_args()
+    print("Running "+mode+" for "+str(duration)+" updates @ "+str(fps)+" fps.")
     # must run in duplicate mode!
     arena.run(animate, "DUPLICATE")

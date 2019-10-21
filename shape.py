@@ -139,30 +139,23 @@ def fill_shape(shape):
     else: everything = False
     for x in range(min_x, max_x+1):
         for y in range(min_y, max_y+1):
-            if everything:
+            if everything: # this saves a lot of time
                 filling.append((x,y))
                 continue
             # Every point inside the rectangle has, on the same axis,
             # one shape point larger and one smaller than itself
             # XXX Not perfect, but works for simple (convex) shapes
-            surrounding = [0,0,0,0]
+            surrounding = [False,False,False,False]
             for c in shape:
                 if c[0] == x:
-                    if c[1] > y: surrounding[0] = 1
-                    elif c[1] < y: surrounding[1] = 1
+                    if c[1] > y: surrounding[0] = True
+                    elif c[1] < y: surrounding[1] = True
                 elif c[1] == y:
-                    if c[0] > x: surrounding[2] = 1
-                    elif c[0] < x: surrounding[3] = 1
-                if sum(surrounding) == 4:
+                    if c[0] > x: surrounding[2] = True
+                    elif c[0] < x: surrounding[3] = True
+                if all(surrounding):
                     filling.append((x,y))
                     break
-            #FIXME this seems to be highly ineffective!
-            # yl = filter(lambda c: c[0] == x and c[1] > y, shape)
-            # yg = filter(lambda c: c[0] == x and c[1] < y, shape)
-            # xl = filter(lambda c: c[1] == y and c[0] > x, shape)
-            # xg = filter(lambda c: c[1] == y and c[0] < x, shape)
-            # if not 0 in map(len, (yl,yg,xl,xg)):
-            #     filling.append((x,y))
     shape.extend(filling)
     return shape
 
