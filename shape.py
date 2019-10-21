@@ -114,10 +114,19 @@ def fill_shape(shape):
     yvals = map(lambda c: c[1], shape)
     min_x, min_y = min(xvals), min(yvals)
     max_x, max_y = max(xvals), max(yvals)
+    # special case where the whole rectangle must be filled
+    if ((max_x-min_x) + (max_y-min_y)+1)*2 == len(shape):
+        everything = True
+    else: everything = False
     for x in range(min_x, max_x+1):
         for y in range(min_y, max_y+1):
-            # Every point inside the rectangle has, on the same
-            # axis, one point larger and one smaller than itself
+            if everything:
+                filling.append((x,y))
+                continue
+            # Every point inside the rectangle has, on the same axis,
+            # one shape point larger and one smaller than itself
+            # XXX Not perfect, but works for simple shapes
+            #FIXME this seems to be highly ineffective!
             yl = filter(lambda c: c[0] == x and c[1] > y, shape)
             yg = filter(lambda c: c[0] == x and c[1] < y, shape)
             xl = filter(lambda c: c[1] == y and c[0] > x, shape)
