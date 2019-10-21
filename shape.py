@@ -25,8 +25,25 @@ def plot(coords, colour="green", flush=False):
 ## SHAPE DEFINITIONS
 ## A shape is a list of coordinate tuples whose pixels are to be drawn
 
+def hline(x1, x2, y):
+    "A horizontal line from x1/y to x2/y"
+    shape = []
+    for x in range(x1, x2+1):
+        shape.append((x,y))
+    return shape
+
+def vline(x, y1, y2):
+    "A vertical line from x/y1 to x/y2"
+    shape = []
+    for y in range(y1, y2+1):
+        shape.append((x,y))
+    return shape
+
 def line(x1, y1, x2, y2):
     "A straight line from x1/y1 to x2/y2"
+    # Special cases for improved performance
+    if x1 == x2: return vline(x1, y1, y2)
+    if y1 == y2: return hline(x1, x2, y1)
     # This is a backport to Python from my Common Lisp croatoan `shapes` extension
     # (https://github.com/McParen/croatoan/blob/master/source/shape.lisp)
     # The idea is to move from left to right one step at a time, calculating how
