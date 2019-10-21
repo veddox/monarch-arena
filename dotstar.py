@@ -12,7 +12,7 @@ class Adafruit_DotStar():
         pass
 
     def setPixelColor(self, i, colour):
-        print i, colour
+        pass
     
     def show(self):
         pass
