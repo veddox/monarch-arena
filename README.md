@@ -28,7 +28,7 @@ There are a couple of scripts to display pre-defined images/animations:
 * `dot_bar.py` is a simplified version of the landscape
 * `optic_flow.py` simulates optic flow using a moving pattern of vertical bars
 
-These can simply be executed from the commandline.
+These can simply be executed from the commandline with `./<scriptname>.py`.
 
 ## Usage
 
