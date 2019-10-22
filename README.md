@@ -13,22 +13,20 @@ file for more details.
 
 ## Overview
 
-The repository contains a module (`arena.py`) that interfaces with the 
+The repository contains a library module (`arena.py`) that interfaces with the 
 hardware via the [Adafruit DotStar](https://github.com/adafruit/Adafruit_DotStar_Pi)
 library and offers a choice between various display modes (`SERIAL`, `PARALLEL`,
 `DUPLICATE`, `TEXT`).
 
 The `shape.py` module provides a range of shape drawing functions that can be
-used to construct experiment display setups.
+used to create animations for experiment setups.
 
-There are a couple of scripts to display pre-defined images/animations:
+There are a couple of scripts to display pre-defined images or animations:
 
 * `house.py` is an example script that draws an image of a house
 * `landscape.py` animates two elements moving around a simple landscape
-* `dot_bar.py` is a simplified version of the landscape
+* `dot_bar.py` shows a dot and a vertical bar rotating in opposite directions
 * `optic_flow.py` simulates optic flow using a moving pattern of vertical bars
-
-These can simply be executed from the commandline with `./<scriptname>.py`.
 
 ## Usage
 
@@ -43,7 +41,12 @@ or individual pixels:
 To create displays and animations, import the `arena` and `shape` modules. Use 
 `arena.set_mode()` to choose a mode. Write a function that does what you want, 
 then pass this function to `arena.run()` for safe execution. For more details,
-read the API documentation or see the examples in `house.py` and `landscape.py`.
+read the API documentation in `API.md` or see the examples in `house.py` and 
+`landscape.py`.
+
+The scripts can simply be executed from the commandline with `./<scriptname>.py`
+(Each individual script also has its usage and options documented in the source 
+code.)
 
 **IMPORTANT:** If you are running this on a Raspberry Pi, delete the `RPi` 
 directory and the `dotstar.py` module. These are mockups used during 
