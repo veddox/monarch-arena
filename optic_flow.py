@@ -6,9 +6,12 @@
 ### University of Wuerzburg, Center for Computational and Theoretical Biology
 ### Licensed under the terms of the GNU GPLv3
 
-### Usage: './optic_flow.py <mode> <fps>', where
+### Usage: './optic_flow.py <mode> <fps> <duration> <colour> <fast>', where
 ### <mode> is one of ROTATE_RIGHT, ROTATE_LEFT, FLOW_FORWARD, FLOW_BACKWARD
 ### <fps> is the delay in sec^-1 between screen updates
+### <duration> is the number of updates to run the animation for
+### <colour> is the foreground colour to use (see arena.py for options)
+### <fast> if this is "fast" or "true", turn on fast rotation (see below)
 
 
 import arena, shape
@@ -24,7 +27,7 @@ options = ("ROTATE_RIGHT", "ROTATE_LEFT", "FLOW_FORWARD", "FLOW_BACKWARD")
 mode = "ROTATE_RIGHT"
 
 # Animation speed in frames per second
-#XXX doesn't seem to have an effect? -> limited by hardware
+# NOTE: this cannot be sensibly increased _ad infinitum_
 global fps
 fps = 21
 
@@ -34,7 +37,12 @@ duration = -1 #default -1
 
 # Foreground and background colour
 global fg_col, bg_col
-fg_col, bg_col = "blue", "black"
+fg_col, bg_col = "green", "black"
+
+# Optimise for speed in rotate(), ignoring possibly dodgy panels
+# (see explanation in rotate() for more details)
+global fast
+fast = False
 
 ### FUNCTIONS ###
 
@@ -52,14 +60,31 @@ def panel_pattern(x_off):
 
 def rotate(cw=True):
     "Rotate the bar pattern, clockwise (if cw is True) or anticlockwise."
-    global fps, duration
+    global fps, duration, fast
     t,i = 0,0
     while i != duration:
+        p1 = time.time() # time measuring point 1
         if cw: x_offset = t
         else: x_offset = t * (-1)
         panel_pattern(x_offset)
+        # Theoretically, the arena should be able to render all eight
+        # panels simultaneously. However, on at least one arena, one panel
+        # develops problems with this approach. Therefore, I here revert to
+        # only updating half the panels at once. If speed is off the essence,
+        # this behaviour can be turned off using the `fast` flag.
+        if not fast:
+            for p in range(8):
+                if p < 4: arena.toggle_panel(p, True)
+                else: arena.toggle_panel(p, False)
+            arena.render()
+            panel_pattern(x_offset)
+            for p in range(8):
+                if p < 4: arena.toggle_panel(p, False)
+                else: arena.toggle_panel(p, True)
         arena.render()
-        time.sleep(1.0/fps)
+        p2 = time.time() # time measuring point 2
+        sleep_time = (1.0/fps) - (p2-p1)
+        if sleep_time > 0: time.sleep(sleep_time)
         if t < 7: t = t+1
         else: t = 0
         i = i + 1
@@ -69,6 +94,7 @@ def flow(fw=True):
     global fps, duration
     t,i = 0,0
     while i != duration:
+        p1 = time.time() # time measuring point 1
         if fw: x_left, x_right = t*(-1)+4, t
         else: x_left, x_right = t+4, t*(-1)
         panel_pattern(x_right)
@@ -81,7 +107,9 @@ def flow(fw=True):
             if p < 4: arena.toggle_panel(p, False)
             else: arena.toggle_panel(p, True)
         arena.render()
-        time.sleep(1.0/fps)
+        p2 = time.time() # time measuring point 2
+        sleep_time = (1.0/fps) - (p2-p1)
+        if sleep_time > 0: time.sleep(sleep_time)
         if t < 7: t = t+1
         else: t = 0
         i = i + 1
@@ -107,8 +135,8 @@ def parse_args():
     2nd param: fps
     3rd param: duration
     '''
-    global options, mode, fps, duration
-    if len(sys.argv) > 4:
+    global options, mode, fps, duration, fg_col, fast
+    if len(sys.argv) > 6:
         raise Exception("Bad number of args. See the source for details.")
     if len(sys.argv) >= 2:
         mode = sys.argv[1]
@@ -119,6 +147,11 @@ def parse_args():
         fps = int(sys.argv[2])
     if len(sys.argv) >= 4:
         duration = int(sys.argv[3])
+    if len(sys.argv) >= 5:
+        fg_col = sys.argv[4]
+    if len(sys.argv) >= 6:
+        if sys.argv[5] in ("fast", "True", "true", "TRUE"):
+            fast = True
 
 if __name__ == '__main__':
     parse_args()
