@@ -51,6 +51,7 @@ def line(x1, y1, x2, y2):
     # The idea is to move from left to right one step at a time, calculating how
     # many pixels we need to stack vertically at each position to get a
     # "straight line"
+    #FIXME does the line end up being too long?
     shape = []
     # make sure we're moving from left to right
     if x1 > x2 or (x1 == x2 and y1 > y2):
@@ -134,7 +135,7 @@ def fill_shape(shape):
     min_x, min_y = min(xvals), min(yvals)
     max_x, max_y = max(xvals), max(yvals)
     # special case where the whole rectangle must be filled
-    if ((max_x-min_x) + (max_y-min_y)+1)*2 == len(shape):
+    if ((max_x-min_x) + (max_y-min_y)+2)*2 == len(shape):
         everything = True
     else: everything = False
     for x in range(min_x, max_x+1):

@@ -6,9 +6,11 @@
 ### University of Wuerzburg, Center for Computational and Theoretical Biology
 ### Licensed under the terms of the GNU GPLv3
 
-### Usage: './optic_flow.py <mode> <fps>', where
+### Usage: './optic_flow.py <mode> <fps> <duration> <colour>', where
 ### <mode> is one of ROTATE_RIGHT, ROTATE_LEFT, FLOW_FORWARD, FLOW_BACKWARD
 ### <fps> is the delay in sec^-1 between screen updates
+### <duration> is the number of updates to run the animation for
+### <colour> is the foreground colour to use (see arena.py for options)
 
 
 import arena, shape
@@ -34,7 +36,7 @@ duration = -1 #default -1
 
 # Foreground and background colour
 global fg_col, bg_col
-fg_col, bg_col = "blue", "black"
+fg_col, bg_col = "green", "black"
 
 ### FUNCTIONS ###
 
@@ -107,8 +109,8 @@ def parse_args():
     2nd param: fps
     3rd param: duration
     '''
-    global options, mode, fps, duration
-    if len(sys.argv) > 4:
+    global options, mode, fps, duration, fg_col
+    if len(sys.argv) > 5:
         raise Exception("Bad number of args. See the source for details.")
     if len(sys.argv) >= 2:
         mode = sys.argv[1]
@@ -119,6 +121,8 @@ def parse_args():
         fps = int(sys.argv[2])
     if len(sys.argv) >= 4:
         duration = int(sys.argv[3])
+    if len(sys.argv) >= 5:
+        fg_col = sys.argv[4]
 
 if __name__ == '__main__':
     parse_args()

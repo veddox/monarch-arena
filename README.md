@@ -44,7 +44,7 @@ then pass this function to `arena.run()` for safe execution. For more details,
 read the API documentation in `API.md` or see the examples in `house.py` and 
 `landscape.py`.
 
-The scripts can simply be executed from the commandline with `./<scriptname>.py`
+The scripts can simply be executed from the commandline with `./<scriptname>.py`.
 (Each individual script also has its usage and options documented in the source 
 code.)
 
