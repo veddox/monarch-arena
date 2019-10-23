@@ -27,7 +27,7 @@ options = ("ROTATE_RIGHT", "ROTATE_LEFT", "FLOW_FORWARD", "FLOW_BACKWARD")
 mode = "ROTATE_RIGHT"
 
 # Animation speed in frames per second
-#XXX doesn't seem to have an effect? -> limited by hardware
+# NOTE: this cannot be sensibly increased _ad infinitum_
 global fps
 fps = 21
 
@@ -63,6 +63,7 @@ def rotate(cw=True):
     global fps, duration, fast
     t,i = 0,0
     while i != duration:
+        p1 = time.time() # time measuring point 1
         if cw: x_offset = t
         else: x_offset = t * (-1)
         panel_pattern(x_offset)
@@ -81,7 +82,9 @@ def rotate(cw=True):
                 if p < 4: arena.toggle_panel(p, False)
                 else: arena.toggle_panel(p, True)
         arena.render()
-        time.sleep(1.0/fps)
+        p2 = time.time() # time measuring point 2
+        sleep_time = (1.0/fps) - (p2-p1)
+        if sleep_time > 0: time.sleep(sleep_time)
         if t < 7: t = t+1
         else: t = 0
         i = i + 1
@@ -91,6 +94,7 @@ def flow(fw=True):
     global fps, duration
     t,i = 0,0
     while i != duration:
+        p1 = time.time() # time measuring point 1
         if fw: x_left, x_right = t*(-1)+4, t
         else: x_left, x_right = t+4, t*(-1)
         panel_pattern(x_right)
@@ -103,7 +107,9 @@ def flow(fw=True):
             if p < 4: arena.toggle_panel(p, False)
             else: arena.toggle_panel(p, True)
         arena.render()
-        time.sleep(1.0/fps)
+        p2 = time.time() # time measuring point 2
+        sleep_time = (1.0/fps) - (p2-p1)
+        if sleep_time > 0: time.sleep(sleep_time)
         if t < 7: t = t+1
         else: t = 0
         i = i + 1
