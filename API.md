@@ -2,7 +2,7 @@
 
 *This is an overview of functions and variables that can be used when writing new
 animation scripts for the monarch arena. For a complete understanding of how
-the library works, read the source.*
+the library works, or for details on the ready-made scripts, read the source.*
 
 ## arena.py
 
