@@ -8,7 +8,7 @@
 
 ### Usage: './optic_flow.py <mode> <fps> <duration> <colour> <fast>', where
 ### <mode> is one of ROTATE_RIGHT, ROTATE_LEFT, FLOW_FORWARD, FLOW_BACKWARD
-### <fps> is the delay in sec^-1 between screen updates
+### <fps> the frames per second for the animation
 ### <duration> is the number of updates to run the animation for
 ### <colour> is the foreground colour to use (see arena.py for options)
 ### <fast> if this is "fast" or "true", turn on fast rotation (see below)
@@ -134,6 +134,8 @@ def parse_args():
     1st param: animation mode (int or string)
     2nd param: fps
     3rd param: duration
+    4th param: colour
+    5th param: fast mode
     '''
     global options, mode, fps, duration, fg_col, fast
     if len(sys.argv) > 6:
