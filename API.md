@@ -51,6 +51,9 @@ to `plot()`.*
   
 - `line(x1, y1, x2, y2)` Approximate a straight line between two points.
 
+- `hline(x1, x2, y)`, `vline(x, y1=0, y2=arena.height-1)` Draw a straight
+  horizontal or vertical line (more efficient than the generic line function).
+
 - `polygon(corners, filled=True)` Construct a shape by linking the corners,
   optionally filling it out. `corners`: a list of pairs of coordinates.
   
