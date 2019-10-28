@@ -33,7 +33,7 @@ def hline(x1, x2, y):
         shape.append((x,y))
     return shape
 
-def vline(x, y1, y2):
+def vline(x, y1=0, y2=arena.height):
     "A vertical line from x/y1 to x/y2"
     shape = []
     if y2 < y1: y2,y1 = y1,y2

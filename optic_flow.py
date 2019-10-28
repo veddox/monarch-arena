@@ -27,7 +27,9 @@ options = ("ROTATE_RIGHT", "ROTATE_LEFT", "FLOW_FORWARD", "FLOW_BACKWARD")
 mode = "ROTATE_RIGHT"
 
 # Animation speed in frames per second
-# NOTE: this cannot be sensibly increased _ad infinitum_
+# NOTE: this cannot be sensibly increased _ad infinitum_.
+# For rotation with `fast`, the maximum value is around 200 (-> 24Hz),
+# for all other settings, the max is around 100 (-> 12Hz).
 global fps
 fps = 21
 
@@ -49,14 +51,12 @@ fast = False
 def panel_pattern(x_off):
     global fg_col, bg_col
     "Draw a bar pattern on a single panel with a given offset."
-    shape.plot(shape.rectangle(x_off,0, x_off+3,0, x_off+3,arena.height,
-                               x_off,arena.height), fg_col)
-    shape.plot(shape.rectangle(x_off+4,0, x_off+7,0, x_off+7,arena.height,
-                               x_off+4,arena.height), bg_col)
-    shape.plot(shape.rectangle(x_off+8,0, x_off+11,0, x_off+11,arena.height,
-                               x_off+8,arena.height), fg_col)
-    shape.plot(shape.rectangle(x_off+12,0, x_off+15,0, x_off+15,arena.height,
-                               x_off+12,arena.height), bg_col)
+    global fg_col, bg_col
+    col = fg_col
+    for x in range(arena.pwidth):
+        shape.plot(shape.vline(x+x_off), col)
+        if x == 3 or x == 11: col = bg_col
+        elif x == 7: col = fg_col
 
 def rotate(cw=True):
     "Rotate the bar pattern, clockwise (if cw is True) or anticlockwise."
